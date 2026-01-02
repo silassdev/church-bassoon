@@ -4,11 +4,12 @@ import Ticket from '@/models/Ticket';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   await dbConnect();
-  const t = await Ticket.findById(params.id);
+  const { id } = await params;
+  const t = await Ticket.findById(id);
   if (!t) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const role = (session as any).user.role;

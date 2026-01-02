@@ -6,12 +6,13 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import User from '@/models/User';
 import Notification from '@/models/Notification';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { message } = await req.json();
   await dbConnect();
-  const ticket = await Ticket.findById(params.id);
+  const { id } = await params;
+  const ticket = await Ticket.findById(id);
   if (!ticket) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // authorization: member can reply to own ticket; coordinator can reply to any
