@@ -16,6 +16,9 @@ export interface IUser extends Document {
   dob?: Date | null;
   state?: string | null;
   city?: string | null;
+  avatarUrl?: string | null;
+  avatarThumbUrl?: string | null;
+  profileComplete?: boolean;
   createdAt: Date;
 }
 
@@ -34,6 +37,9 @@ const UserSchema = new Schema<IUser>({
   dob: { type: Date, default: null },
   state: { type: String, default: null },
   city: { type: String, default: null },
+  avatarUrl: { type: String, default: null },
+  avatarThumbUrl: { type: String, default: null },
+  profileComplete: { type: Boolean, default: false },
 
   createdAt: { type: Date, default: Date.now },
 });

@@ -13,7 +13,7 @@ type PatchBody = {
 };
 
 function validateProfileInput(data: PatchBody) {
-  const errors: Record<string,string> = {};
+  const errors: Record<string, string> = {};
   if (data.name !== undefined && String(data.name).length > 100) errors.name = 'Name too long';
   if (data.houseAddress !== undefined && String(data.houseAddress).length > 500) errors.houseAddress = 'Address too long';
   if (data.state !== undefined && String(data.state).length > 100) errors.state = 'State too long';
@@ -34,7 +34,7 @@ export async function GET(req: Request) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   await dbConnect();
-  const user = await User.findById((session as any).user.id).select('email name role status houseAddress dob state city createdAt').lean();
+  const user = await User.findById((session as any).user.id).select('email name role status houseAddress dob state city avatarUrl profileComplete createdAt').lean();
   if (!user) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // Return safe profile data
@@ -47,6 +47,8 @@ export async function GET(req: Request) {
     dob: user.dob ? user.dob.toISOString().split('T')[0] : null, // yyyy-mm-dd
     state: user.state || '',
     city: user.city || '',
+    avatarUrl: user.avatarUrl || null,
+    profileComplete: !!user.profileComplete,
     createdAt: user.createdAt,
   });
 }
