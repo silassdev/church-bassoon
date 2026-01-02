@@ -34,8 +34,8 @@ export const authOptions: NextAuthOptions = {
                     throw new Error('Please sign in with Google or set a password in your account settings');
                 }
 
-                if (user.status !== 'active') {
-                    console.log('Auth check failed: Status not active');
+                if (user.status !== 'active' && user.status !== 'approved') {
+                    console.log('Auth check failed: Status not active/approved');
                     throw new Error('Account not active');
                 }
 

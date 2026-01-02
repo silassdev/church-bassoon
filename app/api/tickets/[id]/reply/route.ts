@@ -20,7 +20,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const userId = (session as any).user.id;
   if (role === 'member' && String(ticket.user) !== String(userId)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const author = await User.findById(userId).lean();
+  const author = await User.findById(userId).lean() as any;
   ticket.replies.push({ authorId: userId, authorName: author?.name || author?.email || 'User', message, createdAt: new Date() });
   ticket.status = role === 'coordinator' ? 'pending' : ticket.status;
   await ticket.save();

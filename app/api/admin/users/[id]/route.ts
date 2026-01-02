@@ -3,6 +3,7 @@ import { dbConnect } from '@/lib/db';
 import User from '@/models/User';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import mongoose from 'mongoose';
 
 export async function PATCH(
     req: Request,
@@ -16,20 +17,22 @@ export async function PATCH(
         }
 
         const { id } = await params;
-        console.log('[PATCH] User ID:', id);
-        const body = await req.json();
-        const { status } = body;
-        console.log('[PATCH] New Status:', status);
-
-        const user = await User.findById(id);
-        if (!user) {
-            console.log('[PATCH] User not found in DB');
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return NextResponse.json({ error: 'Invalid User ID format' }, { status: 400 });
         }
 
-        user.status = status;
-        await user.save();
-        console.log('[PATCH] Update successful');
+        const body = await req.json();
+        const { status } = body;
+
+        const user = await User.findByIdAndUpdate(
+            id,
+            { $set: { status } },
+            { new: true, runValidators: true }
+        );
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
 
         return NextResponse.json({ success: true, user });
     } catch (err: any) {
@@ -50,6 +53,10 @@ export async function DELETE(
         }
 
         const { id } = await params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return NextResponse.json({ error: 'Invalid User ID format' }, { status: 400 });
+        }
+
         const user = await User.findByIdAndDelete(id);
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });

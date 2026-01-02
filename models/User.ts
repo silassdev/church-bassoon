@@ -38,4 +38,9 @@ const UserSchema = new Schema<IUser>({
   createdAt: { type: Date, default: Date.now },
 });
 
+// Clear the model in development to ensure schema changes are picked up
+if (process.env.NODE_ENV === 'development') {
+  delete mongoose.models.User;
+}
+
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
