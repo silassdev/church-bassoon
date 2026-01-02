@@ -3,31 +3,27 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     FiHome,
-    FiUsers,
-    FiDollarSign,
-    FiBell,
-    FiMessageSquare,
-    FiMail,
+    FiTrello,
+    FiCreditCard,
+    FiCalendar,
     FiSettings
 } from 'react-icons/fi';
 
 const menuItems = [
-    { label: 'Overview', href: '/dashboard/admin', icon: FiHome },
-    { label: 'Users', href: '/dashboard/admin/users', icon: FiUsers },
-    { label: 'Finance', icon: FiDollarSign, href: '/dashboard/admin/finance' },
-    { label: 'Announcement', icon: FiBell, href: '/dashboard/admin/announcement' },
-    { label: 'Feedback', icon: FiMessageSquare, href: '/dashboard/admin/feedback' },
-    { label: 'Email / Newsletter', icon: FiMail, href: '/dashboard/admin/newsletter' },
+    { label: 'Overview', href: '/dashboard/coordinator', icon: FiHome },
+    { label: 'Tickets', href: '/dashboard/coordinator/tickets', icon: FiTrello },
+    { label: 'Payments', href: '/dashboard/coordinator/payments', icon: FiCreditCard },
+    { label: 'Events', href: '/dashboard/coordinator/events', icon: FiCalendar },
 ];
 
-export default function AdminSidebar({ isCollapsed }: { isCollapsed?: boolean }) {
+export default function CoordinatorSidebar({ isCollapsed }: { isCollapsed?: boolean }) {
     const pathname = usePathname();
 
     return (
         <nav className="flex flex-col h-full bg-white dark:bg-slate-900 overflow-y-auto">
             <div className={`p-6 ${isCollapsed ? 'px-2 flex justify-center' : ''}`}>
                 <h2 className={`text-xs font-semibold text-slate-400 uppercase tracking-wider ${isCollapsed ? 'hidden' : ''}`}>
-                    Admin Menu
+                    Coordinator Menu
                 </h2>
                 {isCollapsed && <div className="w-8 h-[1px] bg-slate-200 dark:bg-slate-800" />}
             </div>
@@ -43,11 +39,11 @@ export default function AdminSidebar({ isCollapsed }: { isCollapsed?: boolean })
                             href={item.href}
                             title={isCollapsed ? item.label : ''}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400'
+                                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
                                 : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white'
                                 } ${isCollapsed ? 'justify-center px-0' : ''}`}
                         >
-                            <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'group-hover:text-indigo-600 dark:group-hover:text-indigo-400'}`} />
+                            <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'}`} />
                             {!isCollapsed && <span className="font-medium whitespace-nowrap">{item.label}</span>}
                         </Link>
                     );
@@ -56,7 +52,7 @@ export default function AdminSidebar({ isCollapsed }: { isCollapsed?: boolean })
 
             <div className={`p-4 border-t border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-2' : ''}`}>
                 <Link
-                    href="/dashboard/admin/settings"
+                    href="/dashboard/coordinator/settings"
                     title={isCollapsed ? "Settings" : ""}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all ${isCollapsed ? 'justify-center px-0' : ''}`}
                 >

@@ -114,6 +114,7 @@ export async function POST(req: Request) {
     try {
         await sendVerificationEmail({ to: email, token, userId: user._id.toString() });
     } catch (e) {
+        console.error("Email sending failed:", e);
         await User.deleteOne({ _id: user._id }).catch(() => { });
         return NextResponse.json({ error: 'Failed to send verification email' }, { status: 500 });
     }

@@ -5,8 +5,8 @@ import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiX, FiShield, FiUser, FiLogOut, FiLayout } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle';
-import HeaderNotifications from '@/components/ui/HeaderNotifications';
-
+import HeaderNotifications from '@/app/components/ui/HeaderNotifications';
+import ProfileButton from '@/app/components/ui/ProfileButton';
 
 export default function Header() {
   const { data: session } = useSession();
@@ -76,6 +76,9 @@ export default function Header() {
                     <FiLayout className="w-4 h-4" />
                     Dashboard
                   </Link>
+
+                  <HeaderNotifications />
+                  <ProfileButton />
                   <button
                     onClick={() => signOut({ callbackUrl: '/' })}
                     className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
@@ -137,6 +140,11 @@ export default function Header() {
                     >
                       Dashboard
                     </Link>
+
+                    <div className="flex items-center gap-4 px-3 py-2">
+                      <HeaderNotifications />
+                      <ProfileButton />
+                    </div>
 
                     {session ? (
                       <>

@@ -54,6 +54,11 @@ export default function RegisterPage() {
             setMsg(data?.error || 'Error');
         } else {
             setMsg('Registration successful. Check your email for verification.');
+            setEmail('');
+            setName('');
+            setPassword('');
+            setRole('member');
+            setFormLoadTs(Date.now());
         }
         setLoading(false);
     }
