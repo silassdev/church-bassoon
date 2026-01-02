@@ -6,8 +6,9 @@ declare module "next-auth" {
      */
     interface Session {
         user: {
-            /** The user's postal address. */
-            id: string
+            id: string;
+            role: "admin" | "coordinator" | "member";
+            status: "unverified" | "pending" | "active";
         } & DefaultSession["user"]
     }
 }

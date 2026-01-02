@@ -1,21 +1,28 @@
-import mongoose, { Schema, model, models } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-const UserSchema = new Schema({
-  name: String,
-  email: { type: String, unique: true },
-  image: String,
-  emailVerified: Date,
-}, { timestamps: true });
+export type Role = 'admin' | 'coordinator' | 'member';
+export type Status = 'unverified' | 'pending' | 'active';
 
-export const User = models.User || model('User', UserSchema);
+export interface IUser extends Document {
+  email: string;
+  passwordHash?: string;
+  name?: string;
+  role: Role;
+  status: Status;
+  verificationToken?: string;
+  approvedBy?: mongoose.Types.ObjectId | null;
+  createdAt: Date;
+}
 
-// models/BattleResult.ts
-const BattleResultSchema = new Schema({
-  winnerUsername: { type: String, required: true },
-  loserUsername: { type: String, required: true },
-  winnerScore: { type: Number, required: true },
-  loserScore: { type: Number, required: true },
-  playedBy: { type: Schema.Types.ObjectId, ref: 'User' }, 
-}, { timestamps: true });
+const UserSchema = new Schema<IUser>({
+  email: { type: String, required: true, unique: true },
+  passwordHash: { type: String },
+  name: { type: String },
+  role: { type: String, enum: ['admin', 'coordinator', 'member'], default: 'member' },
+  status: { type: String, enum: ['unverified', 'pending', 'active'], default: 'unverified' },
+  verificationToken: { type: String },
+  approvedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+  createdAt: { type: Date, default: Date.now },
+});
 
-export const BattleResult = models.BattleResult || model('BattleResult', BattleResultSchema);
+export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
