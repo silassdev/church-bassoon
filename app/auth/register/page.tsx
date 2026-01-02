@@ -7,9 +7,6 @@ import { FiUser, FiMail, FiLock, FiShield, FiArrowRight, FiAlertCircle, FiCheck 
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 
-declare global {
-    interface Window { grecaptcha: any; }
-}
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -25,53 +22,22 @@ export default function RegisterPage() {
     useEffect(() => {
         setFormLoadTs(Date.now());
         setEmailConfirm(email);
-        const key = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-        if (!key) return;
-        if (document.querySelector(`#recaptcha-script`)) return;
-        const s = document.createElement('script');
-        s.id = 'recaptcha-script';
-        s.src = `https://www.google.com/recaptcha/api.js?render=${key}`;
-        s.async = true;
-        document.head.appendChild(s);
     }, []);
 
     useEffect(() => {
         setEmailConfirm(email);
     }, [email]);
 
-    async function getReCaptchaToken() {
-        const key = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-        if (!key) return null;
-        if (!window.grecaptcha) {
-            await new Promise(res => setTimeout(res, 500));
-            if (!window.grecaptcha) return null;
-        }
-        try {
-            const token = await window.grecaptcha.execute(key, { action: 'register' });
-            return token;
-        } catch {
-            return null;
-        }
-    }
-
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setMsg('');
         setLoading(true);
-
-        const token = await getReCaptchaToken();
-        if (!token) {
-            setMsg('reCAPTCHA failed to load. Try again.');
-            setLoading(false);
-            return;
-        }
 
         const payload = {
             email,
             password,
             name,
             role,
-            recaptchaToken: token,
             hp_field: (document.getElementById('hp_field') as HTMLInputElement)?.value || '',
             email_confirm: emailConfirm,
             form_load_ts: formLoadTs,

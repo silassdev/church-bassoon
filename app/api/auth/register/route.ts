@@ -4,20 +4,12 @@ import User from '@/models/User';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import sendVerificationEmail from '@/lib/email/sendVerificationEmail';
-import verifyReCaptcha from '@/lib/recaptcha';
 import { isLimited } from '@/lib/rateLimit';
 import { UserRole, AuthProvider } from '@/lib/constants';
 
-let isLimitedRedis: ((key: string) => Promise<{ limited: boolean; remaining: number; resetSeconds: number }>) | null = null;
-if (process.env.REDIS_URL) {
-    isLimitedRedis = async (key: string) => {
-        const mod = await import('@/lib/rateLimitRedis');
-        return mod.isLimitedRedis(key);
-    };
-}
 
 function getIpFromReq(req: Request) {
-    const xff = req.headers.get('x-forwarded-for');
+    const xff = req.headers.get('x-forward-for');
     if (xff) return xff.split(',')[0].trim();
     const cf = req.headers.get('cf-connecting-ip');
     if (cf) return cf;
@@ -40,29 +32,20 @@ export async function POST(req: Request) {
         password,
         name,
         role,
-        recaptchaToken,
         hp_field,
         email_confirm,
         form_load_ts,
     } = raw || {};
 
     if (!email) return NextResponse.json({ error: 'Email required' }, { status: 400 });
-    if (!recaptchaToken) return NextResponse.json({ error: 'reCAPTCHA token required' }, { status: 400 });
 
     const ip = getIpFromReq(req);
     const limiterKey = `register:${ip}`;
 
-    // Rate limit: choose Redis if available
-    if (isLimitedRedis) {
-        const res = await isLimitedRedis(limiterKey);
-        if (res.limited) {
-            return NextResponse.json({ error: 'Too many requests', retryAfter: res.resetSeconds }, { status: 429 });
-        }
-    } else {
-        const res = isLimited(limiterKey);
-        if (res.limited) {
-            return NextResponse.json({ error: 'Too many requests', retryAfter: res.resetSeconds }, { status: 429 });
-        }
+    // Rate limit: using in-memory isLimited
+    const resLimit = isLimited(limiterKey);
+    if (resLimit.limited) {
+        return NextResponse.json({ error: 'Too many requests', retryAfter: resLimit.resetSeconds }, { status: 429 });
     }
 
     // --- HONEYPOT / HEURISTICS CHECKS ---
@@ -72,33 +55,21 @@ export async function POST(req: Request) {
     // 1) obvious user-agent bots
     if (isBotUserAgent(ua)) {
         // increment separate counter for bot attempts
-        if (isLimitedRedis) {
-            await isLimitedRedis(`hp:${ip}`);
-        } else {
-            isLimited(`hp:${ip}`);
-        }
+        isLimited(`hp:${ip}`);
         console.warn('Honeypot blocked by UA', { ip, ua, email });
         return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
     }
 
     // 2) hp_field must be empty
     if (hp_field && (String(hp_field).trim().length > 0)) {
-        if (isLimitedRedis) {
-            await isLimitedRedis(`hp:${ip}`);
-        } else {
-            isLimited(`hp:${ip}`);
-        }
+        isLimited(`hp:${ip}`);
         console.warn('Honeypot triggered (hp_field filled)', { ip, email });
         return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
     }
 
     // 3) email_confirm must match visible email (simple anti-bot check)
     if (String((email_confirm || '')).toLowerCase() !== String((email || '')).toLowerCase()) {
-        if (isLimitedRedis) {
-            await isLimitedRedis(`hp:${ip}`);
-        } else {
-            isLimited(`hp:${ip}`);
-        }
+        isLimited(`hp:${ip}`);
         console.warn('Honeypot triggered (email_confirm mismatch)', { ip, email, email_confirm });
         return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
     }
@@ -108,34 +79,18 @@ export async function POST(req: Request) {
     if (!isNaN(tsNum) && tsNum > 0) {
         const deltaSec = (nowMs - tsNum) / 1000;
         if (deltaSec < MIN_FORM_FILL_SECONDS) {
-            if (isLimitedRedis) {
-                await isLimitedRedis(`hp:${ip}`);
-            } else {
-                isLimited(`hp:${ip}`);
-            }
+            isLimited(`hp:${ip}`);
             console.warn('Honeypot triggered (too fast)', { ip, email, deltaSec });
             return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
         }
     } else {
         // suspicious if no timestamp provided
-        if (isLimitedRedis) {
-            await isLimitedRedis(`hp:${ip}`);
-        } else {
-            isLimited(`hp:${ip}`);
-        }
+        isLimited(`hp:${ip}`);
         console.warn('Honeypot triggered (no form_load_ts)', { ip, email });
         return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
     }
 
-    // --- reCAPTCHA verification ---
-    try {
-        const rec = await verifyReCaptcha(recaptchaToken, ip === 'unknown' ? undefined : ip);
-        if (!rec.ok) {
-            return NextResponse.json({ error: 'reCAPTCHA validation failed', details: rec.error }, { status: 400 });
-        }
-    } catch (e) {
-        return NextResponse.json({ error: 'reCAPTCHA verification error' }, { status: 500 });
-    }
+    // --- reCAPTCHA verification removed ---
 
     // --- proceed with normal registration ---
     await dbConnect();
