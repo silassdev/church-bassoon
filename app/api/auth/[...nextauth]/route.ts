@@ -1,9 +1,10 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import dbConnect from '@/lib/db';
+import { dbConnect } from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcrypt';
+import { UserRole, AuthProvider } from '@/lib/constants';
 
 export const authOptions: NextAuthOptions = {
     session: { strategy: 'jwt' },
@@ -16,19 +17,31 @@ export const authOptions: NextAuthOptions = {
                 const email = credentials?.email?.toLowerCase?.();
                 if (!email || !credentials?.password) throw new Error('Missing credentials');
                 const user = await User.findOne({ email });
+                console.log('--- Auth Debug ---');
+                console.log('Email:', email);
+                console.log('User found:', !!user);
+
                 if (!user) throw new Error('No account found');
 
+                const dbProvider = user.provider || AuthProvider.CREDENTIALS;
+                console.log('Provider in DB (effective):', dbProvider);
+                console.log('Provider expected:', AuthProvider.CREDENTIALS);
+                console.log('Status in DB:', user.status);
+
                 // enforce provider consistency: if account was created with Google, require Google unless password is set
-                if (user.provider !== 'credentials') {
-                    // no password set
+                if (dbProvider !== AuthProvider.CREDENTIALS) {
+                    console.log('Auth check failed: Provider mismatch');
                     throw new Error('Please sign in with Google or set a password in your account settings');
                 }
 
                 if (user.status !== 'active') {
+                    console.log('Auth check failed: Status not active');
                     throw new Error('Account not active');
                 }
 
                 const valid = user.passwordHash ? await bcrypt.compare(credentials.password, user.passwordHash) : false;
+                console.log('Password valid:', valid);
+
                 if (!valid) throw new Error('Invalid credentials');
 
                 return { id: user._id.toString(), email: user.email, name: user.name, role: user.role, provider: user.provider };
@@ -47,14 +60,14 @@ export const authOptions: NextAuthOptions = {
             await dbConnect();
 
             // Google OAuth flow
-            if (account?.provider === 'google') {
+            if (account?.provider === AuthProvider.GOOGLE) {
                 const email = (user.email || '').toLowerCase();
                 if (!email) return false;
 
                 const existing = await User.findOne({ email });
 
                 // If existing user created with credentials (email/password) and provider === 'credentials', do not allow Google login automatically.
-                if (existing && existing.provider === 'credentials') {
+                if (existing && existing.provider === AuthProvider.CREDENTIALS) {
                     // Prevent OAuth sign in for an account created with credentials (unless the user links accounts separately)
                     return '/auth/error?error=use-credentials';
                 }
@@ -64,9 +77,9 @@ export const authOptions: NextAuthOptions = {
                     await User.create({
                         email,
                         name: user.name,
-                        role: 'member',
+                        role: UserRole.MEMBER,
                         status: 'active',
-                        provider: 'google',
+                        provider: AuthProvider.GOOGLE,
                         verificationToken: null,
                     });
                     return true;
@@ -110,4 +123,5 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

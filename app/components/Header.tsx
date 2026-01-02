@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiMenu, FiX, FiGithub, FiUser, FiLogOut } from 'react-icons/fi';
+import { FiMenu, FiX, FiShield, FiUser, FiLogOut, FiLayout } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
@@ -18,7 +18,8 @@ export default function Header() {
   }, []);
 
   const navItems = [
-    { label: 'Leaderboard', href: '/leaderboard' },
+    { label: 'Platform', href: '/' },
+    { label: 'Contact', href: '/contact' },
   ];
 
   return (
@@ -31,16 +32,15 @@ export default function Header() {
           {/* Left: Brand */}
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-md flex items-center justify-center bg-black/90 dark:bg-white/90 text-white dark:text-black">
-                {/* Simple mark; replace with SVG if you have one */}
-                <FiGithub className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+                <FiShield className="w-6 h-6" />
               </div>
               <div>
-                <span className="font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                  GitBattle
+                <span className="font-black text-xl tracking-tight text-slate-900 dark:text-white">
+                  ChurchDev
                 </span>
-                <div className="text-[12px] text-slate-500 dark:text-slate-400 -mt-0.5">
-                  Compare. Visualize. Rank.
+                <div className="text-[10px] uppercase font-bold tracking-widest text-indigo-500 -mt-1">
+                  Ministry Excellence
                 </div>
               </div>
             </Link>
@@ -66,31 +66,27 @@ export default function Header() {
               <ThemeToggle />
 
               {session ? (
-                <div className="flex items-center gap-3">
-                  {session.user?.image && (
-                    <img
-                      src={session.user.image}
-                      alt=""
-                      className="w-8 h-8 rounded-full"
-                    />
-                  )}
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {session.user?.name || 'User'}
-                  </span>
+                <div className="flex items-center gap-4">
+                  <Link
+                    href={`/dashboard/${(session.user as any).role || 'member'}`}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm font-bold"
+                  >
+                    <FiLayout className="w-4 h-4" />
+                    Dashboard
+                  </Link>
                   <button
                     onClick={() => signOut({ callbackUrl: '/' })}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-sm font-medium"
+                    className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                    title="Sign Out"
                   >
-                    <FiLogOut className="w-4 h-4" />
-                    Sign Out
+                    <FiLogOut className="w-5 h-5" />
                   </button>
                 </div>
               ) : (
                 <Link
-                  href="/login"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all text-sm font-bold shadow-sm hover:shadow-md"
+                  href="/auth/signin"
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all text-sm font-bold shadow-lg shadow-indigo-600/20"
                 >
-                  <FiUser className="w-4 h-4" />
                   Sign In
                 </Link>
               )}
@@ -133,11 +129,11 @@ export default function Header() {
                     ))}
 
                     <Link
-                      href="/battle/new"
+                      href={`/dashboard/${(session?.user as any)?.role || 'member'}`}
                       onClick={() => setMobileOpen(false)}
-                      className="mt-2 inline-flex items-center justify-center px-3 py-2 rounded-md bg-sky-600 text-white text-sm font-semibold hover:bg-sky-500 transition"
+                      className="mt-2 inline-flex items-center justify-center px-3 py-2 rounded-md bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-500 transition"
                     >
-                      New Battle
+                      Dashboard
                     </Link>
 
                     {session ? (
@@ -163,7 +159,7 @@ export default function Header() {
                       </>
                     ) : (
                       <Link
-                        href="/login"
+                        href="/auth/signin"
                         onClick={() => setMobileOpen(false)}
                         className="mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                       >

@@ -6,7 +6,7 @@ if (!MONGODB_URI) throw new Error("Define MONGODB_URI in .env");
 
 let cached = (global as any).mongoose || { conn: null, promise: null };
 
-export default async function dbConnect() {
+export async function dbConnect() {
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI).then((m) => m);

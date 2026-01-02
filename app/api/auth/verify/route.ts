@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db';
+import { dbConnect } from '@/lib/db';
 import User from '@/models/User';
 
 export async function GET(req: Request) {
@@ -7,7 +7,7 @@ export async function GET(req: Request) {
     const token = url.searchParams.get('t');
     if (!token) return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
 
-    await connectToDatabase();
+    await dbConnect();
     const user = await User.findOne({ verificationToken: token });
     if (!user) return NextResponse.json({ error: 'Token not found' }, { status: 404 });
 

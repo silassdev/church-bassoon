@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
+import { dbConnect } from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import sendVerificationEmail from '@/lib/email/sendVerificationEmail';
 import verifyReCaptcha from '@/lib/recaptcha';
 import { isLimited } from '@/lib/rateLimit';
+import { UserRole, AuthProvider } from '@/lib/constants';
 
 let isLimitedRedis: ((key: string) => Promise<{ limited: boolean; remaining: number; resetSeconds: number }>) | null = null;
 if (process.env.REDIS_URL) {
@@ -40,9 +41,9 @@ export async function POST(req: Request) {
         name,
         role,
         recaptchaToken,
-        hp_field, // honeypot
-        email_confirm, // hidden email mirror
-        form_load_ts, // client timestamp
+        hp_field,
+        email_confirm,
+        form_load_ts,
     } = raw || {};
 
     if (!email) return NextResponse.json({ error: 'Email required' }, { status: 400 });
@@ -149,14 +150,14 @@ export async function POST(req: Request) {
         email: String(email).toLowerCase(),
         name,
         passwordHash,
-        role: role === 'coordinator' ? 'coordinator' : 'member',
+        role: role === UserRole.COORDINATOR ? UserRole.COORDINATOR : UserRole.MEMBER,
         status: 'unverified',
         verificationToken: token,
-        provider: 'credentials',
+        provider: AuthProvider.CREDENTIALS,
     });
 
     try {
-        await sendVerificationEmail({ to: email, token });
+        await sendVerificationEmail({ to: email, token, userId: user._id.toString() });
     } catch (e) {
         await User.deleteOne({ _id: user._id }).catch(() => { });
         return NextResponse.json({ error: 'Failed to send verification email' }, { status: 500 });
