@@ -5,6 +5,8 @@ import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiX, FiShield, FiUser, FiLogOut, FiLayout } from 'react-icons/fi';
 import ThemeToggle from './ThemeToggle';
+import HeaderNotifications from '@/components/ui/HeaderNotifications';
+
 
 export default function Header() {
   const { data: session } = useSession();

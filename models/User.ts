@@ -1,15 +1,21 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { UserRole, AuthProvider } from '@/lib/constants';
+
+export type Role = 'admin' | 'coordinator' | 'member';
+export type Status = 'unverified' | 'pending' | 'active';
 
 export interface IUser extends Document {
   email: string;
   name?: string;
   passwordHash?: string | null;
-  role: (typeof UserRole)[keyof typeof UserRole];
-  status: 'unverified' | 'pending' | 'active';
-  provider: (typeof AuthProvider)[keyof typeof AuthProvider];
+  role: Role;
+  status: Status;
+  provider: 'credentials' | 'google';
   verificationToken?: string | null;
   approvedBy?: mongoose.Types.ObjectId | null;
+  houseAddress?: string | null;
+  dob?: Date | null;
+  state?: string | null;
+  city?: string | null;
   createdAt: Date;
 }
 
@@ -17,11 +23,18 @@ const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   name: { type: String },
   passwordHash: { type: String, default: null },
-  role: { type: String, enum: Object.values(UserRole), default: UserRole.MEMBER },
-  status: { type: String, enum: ['unverified', 'pending', 'active'], default: 'unverified' },
-  provider: { type: String, enum: Object.values(AuthProvider), default: AuthProvider.CREDENTIALS },
+  role: { type: String, enum: ['admin','coordinator','member'], default: 'member' },
+  status: { type: String, enum: ['unverified','pending','active'], default: 'unverified' },
+  provider: { type: String, enum: ['credentials','google'], default: 'credentials' },
   verificationToken: { type: String, default: null },
   approvedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+
+  // profile fields
+  houseAddress: { type: String, default: null },
+  dob: { type: Date, default: null },
+  state: { type: String, default: null },
+  city: { type: String, default: null },
+
   createdAt: { type: Date, default: Date.now },
 });
 
