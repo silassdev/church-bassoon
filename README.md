@@ -12,7 +12,7 @@ A robust management system for churches featuring hierarchical user roles, secur
 ### Authentication and Security
 - Role-based Access Control (RBAC): Dynamic sidebars and fragments based on user level.
 - Multi-step Registration: Email verification for all users and mandatory admin approval for coordinators.
-- Security Measures: Honeypot fields, rate limiting (Redis/In-memory), and secure password hashing. (reCAPTCHA temporarily disabled)
+- Security Measures: Honeypot fields, in-memory rate limiting, and secure password hashing.
 - Unified Auth: Support for both traditional credentials and Google OAuth.
 
 ## Tech Stack
@@ -21,4 +21,4 @@ A robust management system for churches featuring hierarchical user roles, secur
 - Database: MongoDB via Mongoose
 - Authentication: NextAuth.js
 - Styling: Tailwind CSS
-- Security: ioredis (reCAPTCHA temporarily disabled)
+- Security: Secure password hashing and honeypot protection.
