@@ -17,7 +17,7 @@ export default function RegisterPage() {
     const [msg, setMsg] = useState('');
     const [loading, setLoading] = useState(false);
     const [formLoadTs, setFormLoadTs] = useState<number | null>(null);
-    const [emailConfirm, setEmailConfirm] = useState(''); // hidden mirror
+    const [emailConfirm, setEmailConfirm] = useState('');
 
     useEffect(() => {
         setFormLoadTs(Date.now());
@@ -74,11 +74,6 @@ export default function RegisterPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="max-w-xl w-full"
             >
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">Create Account</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Join our community and start your journey</p>
-                </div>
-
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-2xl">
 
                     {/* Role Selection */}

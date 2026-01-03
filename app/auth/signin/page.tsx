@@ -37,16 +37,9 @@ export default function SignInPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="max-w-md w-full"
             >
-                <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 mb-6 font-black text-2xl">
-                        C
-                    </div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2">Welcome Back</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Continue your ministry management journey</p>
-                </div>
 
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-[2rem] shadow-2xl relative">
-                    {/* Google Sign In */}
+
                     <button
                         onClick={() => signIn('google')}
                         className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all font-bold text-slate-700 dark:text-slate-200"

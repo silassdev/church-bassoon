@@ -1,8 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface INotification extends Document {
-  user: mongoose.Types.ObjectId; // recipient
-  actor?: mongoose.Types.ObjectId | null; // who triggered it
+  user: mongoose.Types.ObjectId;
+  actor?: mongoose.Types.ObjectId | null;
   title: string;
   body?: string;
   url?: string;

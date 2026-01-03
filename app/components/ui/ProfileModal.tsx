@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,16 +9,9 @@ type Props = { open: boolean; onClose: () => void };
 export default function ProfileModal({ open, onClose }: Props) {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
-  // ... (rest of the states)
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // ... (rest of the logic)
 
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -27,6 +21,10 @@ export default function ProfileModal({ open, onClose }: Props) {
   const [city, setCity] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) {
@@ -140,10 +138,12 @@ export default function ProfileModal({ open, onClose }: Props) {
     }
   }
 
-  return (
+  if (!mounted) return null;
+
+  const modalContent = (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -337,4 +337,6 @@ export default function ProfileModal({ open, onClose }: Props) {
       )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }
