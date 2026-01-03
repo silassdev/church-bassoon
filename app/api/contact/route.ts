@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { sendTemplate } from '@/lib/transactionalMailer'
 
 export async function POST(req: Request) {
     try {
