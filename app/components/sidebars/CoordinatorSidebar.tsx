@@ -13,6 +13,8 @@ const menuItems = [
     { label: 'Overview', href: '/dashboard/coordinator', icon: FiHome },
     { label: 'Tickets', href: '/dashboard/coordinator/tickets', icon: FiTrello },
     { label: 'Payments', href: '/dashboard/coordinator/payments', icon: FiCreditCard },
+    { label: 'Posts', href: '/dashboard/coordinator/posts', icon: FiCalendar },
+    { label: 'Notice', href: '/dashboard/coordinator/notice', icon: FiCalendar },
     { label: 'Events', href: '/dashboard/coordinator/events', icon: FiCalendar },
 ];
 
