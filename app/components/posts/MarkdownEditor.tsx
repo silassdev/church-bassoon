@@ -33,28 +33,28 @@ export default function MarkdownEditor({
   }
 
   return (
-    <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm transition-shadow focus-within:shadow-md">
-      <div className="flex items-center gap-1 border-b border-slate-100 p-2 bg-slate-50">
+    <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-900 shadow-sm transition-shadow focus-within:shadow-md">
+      <div className="flex items-center gap-1 border-b border-slate-100 dark:border-slate-800 p-2 bg-slate-50 dark:bg-slate-800/50">
         {tools.map(t => (
           <button
             key={t.label}
             onClick={() => apply(t)}
-            className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-slate-200 rounded transition"
+            className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition"
             title={t.label}
           >
             {t.icon}
           </button>
         ))}
-        <div className="ml-auto flex items-center bg-slate-200 rounded p-1">
+        <div className="ml-auto flex items-center bg-slate-200 dark:bg-slate-700 rounded p-1">
           <button
             onClick={() => setTab('edit')}
-            className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition ${tab === 'edit' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition ${tab === 'edit' ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
           >
             <Edit2 size={12} /> Write
           </button>
           <button
             onClick={() => setTab('preview')}
-            className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition ${tab === 'preview' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            className={`flex items-center gap-1 px-3 py-1 rounded text-xs font-medium transition ${tab === 'preview' ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
           >
             <Eye size={12} /> Preview
           </button>
@@ -63,13 +63,13 @@ export default function MarkdownEditor({
 
       {tab === 'edit' ? (
         <textarea
-          className="w-full p-4 min-h-[400px] outline-none text-slate-700 font-mono text-sm resize-y"
+          className="w-full p-4 min-h-[400px] outline-none text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 font-mono text-sm resize-y"
           placeholder="Write your story..."
           value={value}
           onChange={e => onChange(e.target.value)}
         />
       ) : (
-        <div className="p-6 prose prose-slate max-w-none min-h-[400px] bg-white">
+        <div className="p-6 prose prose-slate dark:prose-invert max-w-none min-h-[400px] bg-white dark:bg-slate-900">
           <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
             {value}
           </ReactMarkdown>

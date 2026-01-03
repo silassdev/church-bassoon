@@ -5,12 +5,12 @@ import jwt from 'jsonwebtoken';
 import { notFound } from 'next/navigation';
 import PostView from '@/app/components/posts/PostView';
 
-interface Props { params: { token: string } }
+interface Props { params: Promise<{ token: string }> }
 
 const PREVIEW_SECRET = process.env.PREVIEW_TOKEN_SECRET || process.env.NEXTAUTH_SECRET;
 
 export default async function PreviewPage({ params }: Props) {
-    const token = params.token;
+    const { token } = await params;
     if (!token) return notFound();
 
     let payload: any = null;
@@ -30,7 +30,7 @@ export default async function PreviewPage({ params }: Props) {
     // Allow preview of drafts and published posts
     // Render server-side to avoid leaking other drafts
     return (
-        <main className="max-w-3xl mx-auto p-6">
+        <main className="max-w-3xl mx-auto p-6 bg-white dark:bg-slate-900">
             <article>
                 <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
                 {post.featureImage && <img src={post.featureImage} alt={post.title} className="w-full h-auto rounded mb-4" />}

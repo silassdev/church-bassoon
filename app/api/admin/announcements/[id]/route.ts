@@ -5,11 +5,11 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { AnnounceBroadcaster } from '@/lib/sse';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { id } = params;
   const { text, active } = await req.json();
   await dbConnect();
   const a = await Announcement.findById(id);
@@ -28,16 +28,16 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   await a.save();
 
   const latest = await Announcement.find({ active: true }).sort({ createdAt: -1 }).limit(50).lean();
-  try { AnnounceBroadcaster.broadcast(JSON.stringify({ action: 'update', announcements: latest })); } catch (e) {}
+  try { AnnounceBroadcaster.broadcast(JSON.stringify({ action: 'update', announcements: latest })); } catch (e) { }
 
   return NextResponse.json(a);
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { id } = params;
   await dbConnect();
   const a = await Announcement.findById(id);
   if (!a) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -52,7 +52,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
   await Announcement.deleteOne({ _id: id });
 
   const latest = await Announcement.find({ active: true }).sort({ createdAt: -1 }).limit(50).lean();
-  try { AnnounceBroadcaster.broadcast(JSON.stringify({ action: 'update', announcements: latest })); } catch (e) {}
+  try { AnnounceBroadcaster.broadcast(JSON.stringify({ action: 'update', announcements: latest })); } catch (e) { }
 
   return NextResponse.json({ ok: true });
 }

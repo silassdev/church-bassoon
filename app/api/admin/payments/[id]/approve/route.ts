@@ -6,16 +6,17 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { sendPaymentStatusEmail } from '@/lib/mailer';
 import User from '@/models/User';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session || (session as any).user.role !== 'admin') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const body = await req.json().catch(()=>({}));
+  const body = await req.json().catch(() => ({}));
   const decision = body.decision === 'decline' ? 'declined' : 'approved';
   const note = String(body.note || '').trim();
 
   await dbConnect();
-  const payment = await Payment.findById(params.id);
+  const payment = await Payment.findById(id);
   if (!payment) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   payment.adminApproval = { by: (session as any).user.id, decision, note, at: new Date() };

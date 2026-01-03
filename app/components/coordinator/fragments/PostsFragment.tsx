@@ -79,7 +79,7 @@ export default function PostFragment() {
                 <img src={p.featureImage} alt={p.title} className="w-full h-full object-cover transition duration-700 group-hover:scale-105" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
-                  <ImageIcon size={32} />
+                  <PlaceholderIcon size={32} />
                 </div>
               )}
               <div className="absolute top-3 right-3">
@@ -141,7 +141,7 @@ export default function PostFragment() {
   );
 }
 
-function ImageIcon({ size, className }: { size?: number, className?: string }) {
+function PlaceholderIcon({ size, className }: { size?: number, className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

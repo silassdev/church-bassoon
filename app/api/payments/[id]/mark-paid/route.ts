@@ -5,18 +5,19 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import Notification from '@/models/Notification';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error:'Unauthorized' }, { status:401 });
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const role = (session as any).user.role;
-  if (role !== 'coordinator' && role !== 'admin') return NextResponse.json({ error:'Forbidden' }, { status:403 });
+  if (role !== 'coordinator' && role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  const noteBody = await req.json().catch(()=>({}));
+  const noteBody = await req.json().catch(() => ({}));
   const note = String(noteBody.note || '').trim();
 
   await dbConnect();
-  const payment = await Payment.findById(params.id);
-  if (!payment) return NextResponse.json({ error:'Not found' }, { status:404 });
+  const payment = await Payment.findById(id);
+  if (!payment) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // mark coordinator attempted paid
   payment.status = 'coordinator_marked_paid';
@@ -29,7 +30,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     // You may optimize to notify specific admin users
     // Fetch admins list optional
     await Notification.create({ user: null, title: `Payment ${payment._id} marked as paid by coordinator`, body: `Amount: ${payment.amount}, note: ${note}`, read: false });
-  } catch(e) {}
+  } catch (e) { }
 
-  return NextResponse.json({ ok:true, payment });
+  return NextResponse.json({ ok: true, payment });
 }

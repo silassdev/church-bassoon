@@ -19,6 +19,8 @@ export async function POST(req: Request) {
   // create announcement: coordinators and admins allowed
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const role = (session as any).user.role;
+  if (role !== 'admin' && role !== 'coordinator') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const { text, active = true } = await req.json();
   if (!text || typeof text !== 'string') return NextResponse.json({ error: 'Text required' }, { status: 400 });

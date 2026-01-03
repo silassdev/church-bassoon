@@ -21,6 +21,7 @@ export default function PostEditor({ initialPost, onSaved }: { initialPost?: Ini
   const [title, setTitle] = useState(initialPost?.title || '');
   const [body, setBody] = useState(initialPost?.body || '');
   const [tags, setTags] = useState(Array.isArray(initialPost?.tags) ? (initialPost!.tags as string[]) : (String(initialPost?.tags || '').split(',').map(t => t.trim()).filter(Boolean)));
+  const [tagsInput, setTagsInput] = useState(Array.isArray(initialPost?.tags) ? initialPost!.tags.join(', ') : String(initialPost?.tags || ''));
   const [featureImage, setFeatureImage] = useState(initialPost?.featureImage || '');
   const [status, setStatus] = useState<'draft' | 'published'>(initialPost?.status || 'draft');
 
@@ -163,11 +164,10 @@ export default function PostEditor({ initialPost, onSaved }: { initialPost?: Ini
             <div>
               <label className="block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1">Tags</label>
               <input
-                value={tags.join(', ')}
+                value={tagsInput}
                 onChange={e => {
-                  const val = e.target.value;
-                  // Don't weirdly optimize typing comma
-                  setTags(val.split(',').map(s => s.trim()).filter(Boolean));
+                  setTagsInput(e.target.value);
+                  setTags(e.target.value.split(',').map(s => s.trim()).filter(Boolean));
                   scheduleAutosave();
                 }}
                 placeholder="news, event, update"
