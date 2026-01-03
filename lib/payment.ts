@@ -5,9 +5,11 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { sendGuestPaymentInitiatedEmail } from '@/lib/mailer';
 
-export async function POST(req: Request) {
-  const body = await req.json().catch(()=>({}));
+export async function associateGuestPaymentsToUser(email: string, userId: string) {
+  if (!email) return 0;
   await dbConnect();
+  const res = await Payment.updateMany({ guestEmail: String(email).trim(), user: null }, { $set: { user: userId } });
+  return res.modifiedCount || (res as any).nModified || 0;
 
   const session = await getServerSession(authOptions);
   const userId = session ? (session as any).user.id : null;

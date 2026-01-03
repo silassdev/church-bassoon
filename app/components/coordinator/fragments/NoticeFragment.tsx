@@ -15,21 +15,21 @@ export default function NoticeFragment() {
     setItems(await r.json());
   }
 
-  useEffect(()=>{ load(); }, [q, status, limit]);
+  useEffect(() => { load(); }, [q, status, limit]);
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-3">Payments (Coordinator)</h2>
+      <h2 className="text-xl font-semibold mb-3">Notice</h2>
       <div className="mb-4 flex gap-2">
-        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search by user email or reference" className="p-2 border rounded flex-1" />
-        <select value={status} onChange={e=>setStatus(e.target.value)} className="p-2 border rounded">
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search by user email or reference" className="p-2 border rounded flex-1" />
+        <select value={status} onChange={e => setStatus(e.target.value)} className="p-2 border rounded">
           <option value="">All</option>
           <option value="success">Success</option>
           <option value="failed">Failed</option>
           <option value="completed">Completed</option>
         </select>
-        <select value={limit} onChange={e=>setLimit(Number(e.target.value))} className="p-2 border rounded">
-          {[10,25,50,100].map(n => <option key={n} value={n}>{n}</option>)}
+        <select value={limit} onChange={e => setLimit(Number(e.target.value))} className="p-2 border rounded">
+          {[10, 25, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
         </select>
       </div>
 

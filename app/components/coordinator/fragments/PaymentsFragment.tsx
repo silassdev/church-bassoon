@@ -2,43 +2,36 @@
 import { useEffect, useState } from 'react';
 
 export default function PaymentsFragment() {
-  const [items, setItems] = useState<any[]>([]);
-  const [q, setQ] = useState('');
-  const [status, setStatus] = useState('');
-  const [limit, setLimit] = useState(25);
+  const [payments, setPayments] = useState<any[]>([]);
 
   async function load() {
-    const qs = new URLSearchParams({ limit: String(limit) });
-    if (q) qs.set('q', q);
-    if (status) qs.set('status', status);
-    const r = await fetch(`/api/payments?${qs.toString()}`);
-    setItems(await r.json());
+    const res = await fetch('/api/payments?role=coordinator'); // implement filter server-side
+    if (res.ok) setPayments(await res.json());
   }
+  useEffect(()=>{ load(); }, []);
 
-  useEffect(()=>{ load(); }, [q, status, limit]);
+  async function markPaid(id: string) {
+    const note = prompt('Enter note (cash received details)') || '';
+    const res = await fetch(`/api/payments/${id}/mark-paid`, { method: 'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ note }) });
+    if (res.ok) load();
+    else alert('Action failed');
+  }
 
   return (
     <div>
       <h2 className="text-xl font-semibold mb-3">Payments (Coordinator)</h2>
-      <div className="mb-4 flex gap-2">
-        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search by user email or reference" className="p-2 border rounded flex-1" />
-        <select value={status} onChange={e=>setStatus(e.target.value)} className="p-2 border rounded">
-          <option value="">All</option>
-          <option value="success">Success</option>
-          <option value="failed">Failed</option>
-          <option value="completed">Completed</option>
-        </select>
-        <select value={limit} onChange={e=>setLimit(Number(e.target.value))} className="p-2 border rounded">
-          {[10,25,50,100].map(n => <option key={n} value={n}>{n}</option>)}
-        </select>
-      </div>
-
       <div className="bg-white rounded shadow">
-        {items.map(p => (
-          <div key={p._id} className="p-3 border-b">
-            <div className="text-sm text-slate-600">{new Date(p.createdAt).toLocaleString()}</div>
-            <div>Amount: ₦{p.amount} • Status: {p.status} • User: {p.userEmail || '-'}</div>
-            <div className="text-xs text-slate-500">Ref: {p.providerReference || '-'}</div>
+        {payments.map(p => (
+          <div key={p._id} className="p-3 border-b flex justify-between">
+            <div>
+              <div className="font-medium">{p.title} • ₦{p.amount}</div>
+              <div className="text-xs text-slate-500">{p.guestEmail || p.guestName || 'guest'} • {new Date(p.createdAt).toLocaleString()}</div>
+              <div className="text-xs">{p.status}</div>
+            </div>
+            <div>
+              {p.status === 'initiated' && <button onClick={()=>markPaid(p._id)} className="px-3 py-1 bg-amber-500 text-white rounded">Mark Paid</button>}
+              {p.status === 'coordinator_marked_paid' && <div className="px-3 py-1 bg-green-100 text-green-700 rounded text-sm">Marked — Pending Admin</div>}
+            </div>
           </div>
         ))}
       </div>

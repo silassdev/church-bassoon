@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/db';
-import User from '@/models/User';
+import User, { IUser } from '@/models/User';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
@@ -34,7 +34,10 @@ export async function GET(req: Request) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   await dbConnect();
-  const user = await User.findById((session as any).user.id).select('email name role status houseAddress dob state city avatarUrl profileComplete createdAt').lean();
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const user = (await User.findById((session as any).user.id)
+    .select('email name role status houseAddress dob state city avatarUrl profileComplete createdAt')
+    .lean()) as unknown as IUser | null;
   if (!user) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // Return safe profile data

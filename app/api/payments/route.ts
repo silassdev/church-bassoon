@@ -1,40 +1,39 @@
 import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/db';
 import Payment from '@/models/Payment';
-import User from '@/models/User';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { sendGuestPaymentInitiatedEmail } from '@/lib/mailer';
+import Notification from '@/models/Notification';
 
-
-export async function GET(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if ((session as any).user.role !== 'coordinator') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
+export async function POST(req: Request) {
+  const body = await req.json().catch(()=>({}));
   await dbConnect();
-  const url = new URL(req.url);
-  const q = url.searchParams.get('q') || '';
-  const status = url.searchParams.get('status') || '';
-  const limit = Math.min(200, Number(url.searchParams.get('limit') || 50));
 
-  const filter: any = {};
-  if (status) filter.status = status;
-  if (q) {
-    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    // search providerReference or user email via aggregation
-    const users = await User.find({ $or: [{ email: re }, { name: re }] }, '_id email').lean();
-    const userIds = users.map(u => u._id);
-    filter.$or = [{ providerReference: re }, { user: { $in: userIds } }];
-  }
+  // If user logged in, attach
+  const session = await getServerSession(authOptions);
+  const userId = session ? (session as any).user.id : null;
 
-  const payments = await Payment.find(filter).sort({ createdAt: -1 }).limit(limit).lean();
+  const title = String(body.title || body.optionTitle || 'Payment').trim();
+  const amount = Number(body.amount || 0);
+  if (!amount || amount <= 0) return NextResponse.json({ error:'Invalid amount' }, { status: 400 });
 
-  // attach user email for display
-  const userIds = Array.from(new Set(payments.map(p => String(p.user))));
-  const users = await User.find({ _id: { $in: userIds } }, 'email').lean();
-  const userMap = new Map(users.map(u => [String(u._id), u.email]));
-  const enriched = payments.map(p => ({ ...p, userEmail: userMap.get(String(p.user)) || '' }));
+  const p = await Payment.create({
+    user: userId,
+    guestName: body.guestName ? String(body.guestName).trim() : (session ? (session as any).user.name : null),
+    guestEmail: body.guestEmail ? String(body.guestEmail).trim() : (session ? (session as any).user.email : null),
+    optionId: body.optionId || null,
+    title,
+    amount,
+    currency: body.currency || 'NGN',
+    method: body.method || 'online',
+    status: 'initiated',
+    metadata: body.metadata || {},
+  });
 
-  return NextResponse.json(enriched);
+  // notify admins/coordinators that a new payment initiated (optional)
+  try {
+    await Notification.create({ user: null, title: `New payment: ${title}`, body: `Amount: ${amount}, by ${p.guestEmail || p.guestName || 'guest'}`, read: false });
+  } catch(e) {}
+
+  return NextResponse.json({ ok:true, paymentId: p._id });
 }
