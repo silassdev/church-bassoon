@@ -1,7 +1,7 @@
 export default function MemberDashboardPage() {
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Welcome, Member</h1>
+            <h1 className="text-1xl font-bold">Welcome, Member</h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                     <h2 className="text-xl font-semibold mb-2 text-slate-700">Quick Actions</h2>

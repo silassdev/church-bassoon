@@ -13,7 +13,7 @@ const menuItems = [
     { label: 'Dashboard', href: '/dashboard/member', icon: FiHome },
     { label: 'My Tickets', href: '/dashboard/member/tickets', icon: FiTrello },
     { label: 'My Payments', href: '/dashboard/member/payments', icon: FiCreditCard },
-    { label: 'Email Preferences', href: '/dashboard/member/prefs', icon: FiMail },
+    { label: 'Email Preferences', href: '/dashboard/member/emailpref', icon: FiMail },
 ];
 
 export default function MemberSidebar({ isCollapsed }: { isCollapsed?: boolean }) {

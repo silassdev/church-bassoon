@@ -5,7 +5,7 @@ import TicketsFragment from './fragments/TicketsFragment';
 import MyPaymentFragment from './fragments/MyPaymentFragment';
 import EmailPrefFragment from './fragments/EmailPrefFragment';
 
-type Section = 'tickets'|'payments'|'prefs'|null;
+type Section = 'tickets'|'payments'|'emailpref'|null;
 
 export default function MemberShell() {
   const [active, setActive] = useState<Section>('tickets');
@@ -17,7 +17,7 @@ export default function MemberShell() {
       <main className="flex-1 p-6">
         {active === 'tickets' && <TicketsFragment />}
         {active === 'payments' && <MyPaymentFragment />}
-        {active === 'prefs' && <EmailPrefFragment />}
+        {active === 'emailpref' && <EmailPrefFragment />}
       </main>
     </div>
   );

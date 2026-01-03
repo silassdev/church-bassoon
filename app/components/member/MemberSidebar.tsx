@@ -3,7 +3,7 @@ export default function MemberSidebar({ active, onSelect }: { active: any; onSel
   const items = [
     { key: 'tickets', label: 'Tickets' },
     { key: 'payments', label: 'My Payment' },
-    { key: 'prefs', label: 'Email Preferences' },
+    { key: 'emailpref', label: 'Email Preferences' },
   ];
   return (
     <nav className="p-4">

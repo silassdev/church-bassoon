@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 
-export default function MyPaymentFragment() {
+export default function PaymentsFragment() {
   const [items, setItems] = useState<any[]>([]);
   useEffect(()=>{ (async ()=> { const r = await fetch('/api/payments/mine'); setItems(await r.json()); })(); }, []);
   return (
