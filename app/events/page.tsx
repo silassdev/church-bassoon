@@ -28,7 +28,7 @@ export default function EventsPage() {
     useEffect(() => {
         async function loadEvents() {
             try {
-                const res = await fetch('/api/events/route');
+                const res = await fetch('/api/events');
                 if (res.ok) {
                     setEvents(await res.json());
                 }
@@ -73,8 +73,8 @@ export default function EventsPage() {
                             key={f}
                             onClick={() => setFilter(f)}
                             className={`px-6 py-2 rounded-xl font-bold text-sm transition-all ${filter === f
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                 }`}
                         >
                             {f.charAt(0).toUpperCase() + f.slice(1)}

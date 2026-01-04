@@ -26,7 +26,7 @@ export default function EventDetailPage() {
     useEffect(() => {
         async function loadEvent() {
             try {
-                const res = await fetch(`/api/events/route`);
+                const res = await fetch(`/api/events`);
                 if (res.ok) {
                     const events = await res.json();
                     const foundEvent = events.find((e: Event) => e._id === params?.id);

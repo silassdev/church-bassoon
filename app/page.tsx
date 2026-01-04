@@ -14,6 +14,124 @@ import {
 } from "react-icons/fi";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import EventModal from "@/app/components/ui/EventModal";
+import { Calendar, MapPin, ExternalLink, Eye } from 'lucide-react';
+
+// Latest Events Component
+function LatestEventsSection() {
+  const [events, setEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadEvents() {
+      try {
+        const res = await fetch('/api/events');
+        if (res.ok) {
+          const allEvents = await res.json();
+          const now = Date.now();
+          const upcoming = allEvents
+            .filter((e: any) => new Date(e.endAt).getTime() > now)
+            .slice(0, 2);
+          setEvents(upcoming);
+        }
+      } catch (err) {
+        console.error('Failed to load events:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadEvents();
+  }, []);
+
+  if (events.length === 0 && !loading) return null;
+
+  return (
+    <>
+      <section className="container py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-black mb-4">Upcoming Events</h2>
+          <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Join us for these exciting upcoming activities and fellowship opportunities.</p>
+        </motion.div>
+
+        {loading ? (
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-80 bg-slate-200 dark:bg-slate-800 rounded-3xl animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {events.map((event, index) => (
+              <motion.div
+                key={event._id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                onClick={() => setSelectedEvent(event)}
+                className="group relative h-96 rounded-3xl overflow-hidden cursor-pointer"
+              >
+                {event.bannerUrl ? (
+                  <img
+                    src={event.bannerUrl}
+                    alt={event.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-emerald-500" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+
+                <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                  <h3 className="text-3xl font-bold mb-3">{event.title}</h3>
+                  {event.description && (
+                    <p className="text-slate-200 text-sm mb-4 line-clamp-2">{event.description}</p>
+                  )}
+                  <div className="flex items-center gap-4 text-sm text-slate-200 mb-4">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar size={14} />
+                      {new Date(event.startAt).toLocaleDateString()}
+                    </span>
+                    {event.location && (
+                      <span className="flex items-center gap-1.5">
+                        <MapPin size={14} />
+                        {event.location}
+                      </span>
+                    )}
+                  </div>
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 text-indigo-300 text-sm font-bold">
+                    <Eye size={16} />
+                    Click to view details
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        <div className="text-center">
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-600/20"
+          >
+            View All Events
+            <FiArrowRight />
+          </Link>
+        </div>
+      </section>
+
+      {selectedEvent && (
+        <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      )}
+    </>
+  );
+}
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
