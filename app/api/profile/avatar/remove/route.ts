@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import dbConnect from '@/lib/db';
+import { dbConnect } from '@/lib/db';
 import User from '@/models/User';
 import path from 'path';
 import fs from 'fs/promises';

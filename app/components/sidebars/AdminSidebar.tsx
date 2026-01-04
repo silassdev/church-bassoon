@@ -8,6 +8,7 @@ import {
     FiBell,
     FiMessageSquare,
     FiMail,
+    FiCalendar,
     FiSettings
 } from 'react-icons/fi';
 
@@ -17,6 +18,7 @@ const menuItems = [
     { label: 'Finance', icon: FiDollarSign, href: '/dashboard/admin/finance' },
     { label: 'Announcement', icon: FiBell, href: '/dashboard/admin/announcement' },
     { label: 'Feedback', icon: FiMessageSquare, href: '/dashboard/admin/feedback' },
+    { label: 'Events', icon: FiCalendar, href: '/dashboard/admin/events' },
     { label: 'Email / Newsletter', icon: FiMail, href: '/dashboard/admin/newsletter' },
 ];
 

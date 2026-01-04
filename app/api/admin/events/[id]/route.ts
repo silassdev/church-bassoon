@@ -5,11 +5,11 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { EventBroadcaster } from '@/lib/sse';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const id = params.id;
   const body = await req.json().catch(() => ({}));
   await dbConnect();
   const e = await Event.findById(id);
@@ -35,15 +35,16 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
   const now = new Date();
   const upcoming = await Event.find({ active: true, endAt: { $gt: now } }).sort({ startAt: 1 }).limit(50).lean();
-  try { EventBroadcaster.broadcast(JSON.stringify({ action: 'update', events: upcoming })); } catch (err) {}
+  try { EventBroadcaster.broadcast(JSON.stringify({ action: 'update', events: upcoming })); } catch (err) { }
 
   return NextResponse.json(e);
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const id = params.id;
+
   await dbConnect();
   const e = await Event.findById(id);
   if (!e) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -58,7 +59,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 
   const now = new Date();
   const upcoming = await Event.find({ active: true, endAt: { $gt: now } }).sort({ startAt: 1 }).limit(50).lean();
-  try { EventBroadcaster.broadcast(JSON.stringify({ action: 'update', events: upcoming })); } catch (err) {}
+  try { EventBroadcaster.broadcast(JSON.stringify({ action: 'update', events: upcoming })); } catch (err) { }
 
   return NextResponse.json({ ok: true });
 }
