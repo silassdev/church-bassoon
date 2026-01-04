@@ -448,42 +448,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* User Tiers Section */}
-      <section className="container py-24 bg-slate-100/50 dark:bg-slate-900/50 rounded-[3rem] my-24 border border-slate-200 dark:border-slate-800">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-black mb-4">Hierarchical Excellence</h2>
-          <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">Tailored interfaces for every role within your organization.</p>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
-          {userTiers.map((tier, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className={`p-10 rounded-[2.5rem] border ${tier.color} flex flex-col h-full`}
-            >
-              <h3 className={`text-2xl font-black mb-4 ${tier.iconColor}`}>{tier.role}</h3>
-              <p className="text-slate-500 dark:text-slate-300 text-sm mb-8 leading-relaxed">{tier.description}</p>
-
-              <div className="space-y-4 mt-auto">
-                {tier.features.map((f, i) => (
-                  <div key={i} className="flex items-center gap-3 text-sm font-medium">
-                    <div className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${tier.iconColor} bg-white dark:bg-slate-800 shadow-sm`}>
-                      <FiCheck size={12} strokeWidth={4} />
-                    </div>
-                    {f}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* NEW: 4-Image Carousel */}
+      {/* Image Carousel */}
       <section className="container py-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

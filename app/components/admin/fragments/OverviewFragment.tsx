@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import {
   Users,
   CircleDollarSign,
@@ -11,17 +12,55 @@ import {
 } from 'lucide-react';
 
 export default function OverviewFragment() {
+  const [totalUsers, setTotalUsers] = useState('...');
+  const [totalAnnouncements, setTotalAnnouncements] = useState('...');
+  const [monthlyFinance, setMonthlyFinance] = useState('...');
+
+  useEffect(() => {
+    async function loadStats() {
+      // Fetch total users
+      try {
+        const usersRes = await fetch('/api/admin/users?limit=1');
+        if (usersRes.ok) {
+          const data = await usersRes.json();
+          setTotalUsers(data.total?.toString() || '0');
+        }
+      } catch (err) {
+        console.error('Failed to load users:', err);
+        setTotalUsers('0');
+      }
+
+      // Fetch total announcements
+      try {
+        const announcementsRes = await fetch('/api/announcements/preview');
+        if (announcementsRes.ok) {
+          const announcements = await announcementsRes.json();
+          setTotalAnnouncements(announcements.length?.toString() || '0');
+        }
+      } catch (err) {
+        console.error('Failed to load announcements:', err);
+        setTotalAnnouncements('0');
+      }
+
+      // Fetch monthly finance (you can implement this based on your finance API)
+      // For now, keeping as placeholder
+      // setMonthlyFinance('$12,450');
+    }
+
+    loadStats();
+  }, []);
+
   const stats = [
-    { label: 'Total Users', value: '...', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-    { label: 'Monthly Finance', value: '...', icon: CircleDollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-    { label: 'Announcements', value: '...', icon: Megaphone, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+    { label: 'Total Users', value: totalUsers, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
+    { label: 'Monthly Finance', value: monthlyFinance, icon: CircleDollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+    { label: 'Announcements', value: totalAnnouncements, icon: Megaphone, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/20' },
   ];
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-8">
         <div>
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
+          <h2 className="text-1xl font-black text-slate-900 dark:text-white flex items-center gap-3">
             <LayoutDashboard className="text-indigo-600" size={32} />
             Command Center
           </h2>

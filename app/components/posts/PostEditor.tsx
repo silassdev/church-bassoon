@@ -48,10 +48,10 @@ export default function PostEditor({ initialPost, onSaved }: { initialPost?: Ini
     debounceRef.current = window.setTimeout(() => flushSave(true), 4000);
   }
 
-  async function flushSave(isAutoSave = false) {
+  async function flushSave(isAutoSave = false, override: Partial<Initial> = {}) {
     if (!title.trim()) return;
     setSaving(true);
-    const payload: any = { id, title, body, tags, featureImage, status };
+    const payload: any = { id, title, body, tags, featureImage, status, ...override };
     try {
       const res = await fetch('/api/posts/autosave', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
       const j = await res.json();
@@ -99,7 +99,10 @@ export default function PostEditor({ initialPost, onSaved }: { initialPost?: Ini
               <Settings size={20} />
             </button>
             <button
-              onClick={() => { update(() => setStatus('published')); flushSave(false); }}
+              onClick={() => {
+                setStatus('published');
+                flushSave(false, { status: 'published' });
+              }}
               className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-medium transition shadow-sm hover:shadow"
             >
               <Send size={16} /> Publish

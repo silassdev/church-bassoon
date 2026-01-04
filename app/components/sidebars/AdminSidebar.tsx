@@ -9,13 +9,15 @@ import {
     FiMessageSquare,
     FiMail,
     FiCalendar,
-    FiSettings
+    FiSettings,
+    FiFileText
 } from 'react-icons/fi';
 
 const menuItems = [
     { label: 'Overview', href: '/dashboard/admin', icon: FiHome },
     { label: 'Users', href: '/dashboard/admin/users', icon: FiUsers },
     { label: 'Finance', icon: FiDollarSign, href: '/dashboard/admin/finance' },
+    { label: 'Posts', icon: FiFileText, href: '/dashboard/admin/posts' },
     { label: 'Announcement', icon: FiBell, href: '/dashboard/admin/announcement' },
     { label: 'Feedback', icon: FiMessageSquare, href: '/dashboard/admin/feedback' },
     { label: 'Events', icon: FiCalendar, href: '/dashboard/admin/events' },
