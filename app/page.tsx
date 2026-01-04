@@ -13,8 +13,11 @@ import {
   FiCheck
 } from "react-icons/fi";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   const features = [
     {
       icon: FiCreditCard,
@@ -65,6 +68,42 @@ export default function Home() {
       features: ["Personal Giving History", "Instant Support Tickets", "Event Registration", "Secure Profile Management"]
     }
   ];
+
+  const galleryImages = [
+    {
+      title: "Sunday Service",
+      description: "Join us every Sunday for powerful worship and biblical teaching",
+      link: "/events",
+      image: "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&q=80"
+    },
+    {
+      title: "Community Outreach",
+      description: "Making a difference in our local community through love and service",
+      link: "/about",
+      image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&q=80"
+    },
+    {
+      title: "Youth Programs",
+      description: "Empowering the next generation with faith-based mentorship",
+      link: "/events",
+      image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80"
+    }
+  ];
+
+  const carouselImages = [
+    "https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1200&q=80",
+    "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1200&q=80",
+    "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1200&q=80",
+    "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1200&q=80"
+  ];
+
+  // Auto-rotate carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <main className="relative overflow-hidden min-h-screen">
@@ -158,6 +197,49 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* NEW: Large Image Gallery Section */}
+      <section className="container py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-black mb-4">Moments That Matter</h2>
+          <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Experience the heart of our church community through these special moments.</p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {galleryImages.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="group relative h-96 rounded-3xl overflow-hidden"
+            >
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
+                <p className="text-slate-200 text-sm mb-4 opacity-0 group-hover:opacity-100 transition-opacity">{item.description}</p>
+                <Link
+                  href={item.link}
+                  className="inline-flex items-center gap-2 text-sm font-bold text-indigo-300 hover:text-indigo-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  Learn More <FiArrowRight size={14} />
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* Features Grid */}
       <section className="container py-24 border-t border-slate-200/50 dark:border-slate-800/50">
         <div className="text-center mb-16">
@@ -182,6 +264,69 @@ export default function Home() {
               <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{feature.value}</p>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* NEW: Fade-in Hero Image Section */}
+      <section className="container py-24">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative h-96 lg:h-[500px] rounded-3xl overflow-hidden"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1000&q=80"
+              alt="Church Community"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/40 to-transparent" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4, duration: 1 }}
+            className="space-y-6"
+          >
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+              className="text-4xl md:text-5xl font-black leading-tight"
+            >
+              Building Faith,{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-emerald-600">
+                Together
+              </span>
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.8 }}
+              className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed"
+            >
+              We believe in creating a welcoming environment where everyone can grow in their faith journey.
+              Our community is built on love, service, and the transformative power of God's word.
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 1 }}
+              className="text-slate-500 dark:text-slate-400"
+            >
+              Join us in making a difference in our community and beyond. Experience genuine fellowship,
+              inspiring worship, and practical teaching that will strengthen your walk with Christ.
+            </motion.p>
+          </motion.div>
         </div>
       </section>
 
@@ -220,22 +365,295 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="container pb-32 pt-12">
-        <div className="relative p-12 md:p-24 rounded-[3rem] overflow-hidden bg-slate-900 text-white text-center">
-          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900 via-emerald-900/50 to-indigo-900 opacity-50" />
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-black mb-6">Ready to Transform Your Church?</h2>
-            <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">Join a growing community of churches using modern technology to fulfill their mission.</p>
-            <Link
-              href="/auth/register"
-              className="inline-flex items-center gap-2 px-12 py-5 rounded-2xl bg-white text-indigo-900 font-bold text-lg hover:bg-slate-100 transition-all shadow-2xl"
-            >
-              Start for Free
-              <FiArrowRight />
-            </Link>
+      {/* NEW: 4-Image Carousel */}
+      <section className="container py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-black mb-4">Church Life in Motion</h2>
+          <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Witness the vibrant spirit of our community through these snapshots.</p>
+        </motion.div>
+
+        <div className="relative max-w-5xl mx-auto">
+          <div className="relative h-96 md:h-[500px] rounded-3xl overflow-hidden">
+            {carouselImages.map((image, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: currentSlide === index ? 1 : 0,
+                  scale: currentSlide === index ? 1 : 1.1
+                }}
+                transition={{ duration: 0.7 }}
+                className="absolute inset-0"
+              >
+                <img
+                  src={image}
+                  alt={`Slide ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Navigation Dots */}
+          <div className="flex justify-center gap-2 mt-8">
+            {carouselImages.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-2 h-2 rounded-full transition-all ${currentSlide === index
+                  ? 'bg-indigo-600 w-8'
+                  : 'bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600'
+                  }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
           </div>
         </div>
+      </section>
+
+      {/* NEW: Second Image Gallery */}
+      <section className="container py-24">
+        <div className="grid md:grid-cols-2 gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative h-96 md:h-[500px] rounded-3xl overflow-hidden group"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1000&q=80"
+              alt="Worship Experience"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+              <h3 className="text-3xl font-bold mb-2">Worship Experience</h3>
+              <p className="text-slate-200">Encounter God's presence through powerful worship</p>
+            </div>
+          </motion.div>
+
+          <div className="grid grid-rows-2 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="relative h-full rounded-3xl overflow-hidden group"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&q=80"
+                alt="Prayer Gathering"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <h3 className="text-xl font-bold">Prayer Gatherings</h3>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="relative h-full rounded-3xl overflow-hidden group"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=800&q=80"
+                alt="Fellowship"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <h3 className="text-xl font-bold">Community Fellowship</h3>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Latest Events Section */}
+      <LatestEventsSection />
+
+      {/* Weekly Church Schedule */}
+      <section className="container pb-32 pt-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-black mb-4">Weekly Church Activities</h2>
+          <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Join us throughout the week for worship, fellowship, and spiritual growth.</p>
+        </motion.div>
+
+        <div className="overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gradient-to-r from-indigo-600 to-emerald-600 text-white">
+                  <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Day</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Time</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider">Activity</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wider hidden md:table-cell">Location</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                {/* Sunday */}
+                <motion.tr
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0 }}
+                  className="bg-white dark:bg-slate-900 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <td className="px-6 py-4 font-bold text-indigo-600 dark:text-indigo-400">Sunday</td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">8:00 AM</td>
+                  <td className="px-6 py-4 font-medium">First Service</td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">Main Sanctuary</td>
+                </motion.tr>
+                <motion.tr
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.05 }}
+                  className="bg-slate-50 dark:bg-slate-950 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <td className="px-6 py-4 font-bold text-indigo-600 dark:text-indigo-400"></td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">10:00 AM</td>
+                  <td className="px-6 py-4 font-medium">Second Service</td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">Main Sanctuary</td>
+                </motion.tr>
+
+                {/* Monday */}
+                <motion.tr
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white dark:bg-slate-900 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <td className="px-6 py-4 font-bold text-emerald-600 dark:text-emerald-400">Monday</td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">6:00 PM</td>
+                  <td className="px-6 py-4 font-medium">Prayer Meeting</td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">Prayer Room</td>
+                </motion.tr>
+
+                {/* Tuesday */}
+                <motion.tr
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.15 }}
+                  className="bg-slate-50 dark:bg-slate-950 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <td className="px-6 py-4 font-bold text-amber-600 dark:text-amber-400">Tuesday</td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">7:00 PM</td>
+                  <td className="px-6 py-4 font-medium">Bible Study</td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">Fellowship Hall</td>
+                </motion.tr>
+
+                {/* Wednesday */}
+                <motion.tr
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white dark:bg-slate-900 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <td className="px-6 py-4 font-bold text-rose-600 dark:text-rose-400">Wednesday</td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">6:30 PM</td>
+                  <td className="px-6 py-4 font-medium">Midweek Service</td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">Main Sanctuary</td>
+                </motion.tr>
+
+                {/* Thursday */}
+                <motion.tr
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.25 }}
+                  className="bg-slate-50 dark:bg-slate-950 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <td className="px-6 py-4 font-bold text-purple-600 dark:text-purple-400">Thursday</td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">7:00 PM</td>
+                  <td className="px-6 py-4 font-medium">Youth Fellowship</td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">Youth Center</td>
+                </motion.tr>
+
+                {/* Friday */}
+                <motion.tr
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-white dark:bg-slate-900 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <td className="px-6 py-4 font-bold text-cyan-600 dark:text-cyan-400">Friday</td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">6:00 PM</td>
+                  <td className="px-6 py-4 font-medium">Worship Night</td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">Main Sanctuary</td>
+                </motion.tr>
+
+                {/* Saturday */}
+                <motion.tr
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.35 }}
+                  className="bg-slate-50 dark:bg-slate-950 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <td className="px-6 py-4 font-bold text-teal-600 dark:text-teal-400">Saturday</td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">10:00 AM</td>
+                  <td className="px-6 py-4 font-medium">Men's Fellowship</td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">Fellowship Hall</td>
+                </motion.tr>
+                <motion.tr
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-white dark:bg-slate-900 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <td className="px-6 py-4 font-bold text-teal-600 dark:text-teal-400"></td>
+                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400">2:00 PM</td>
+                  <td className="px-6 py-4 font-medium">Women's Fellowship</td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 hidden md:table-cell">Fellowship Hall</td>
+                </motion.tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* CTA Below Schedule */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5 }}
+          className="mt-16 text-center"
+        >
+          <div className="relative p-12 md:p-16 rounded-[3rem] overflow-hidden bg-gradient-to-br from-indigo-600 to-emerald-600 text-white">
+            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/50 via-emerald-900/30 to-indigo-900/50" />
+            <div className="relative z-10">
+              <h2 className="text-3xl md:text-5xl font-black mb-4">Join Us This Week</h2>
+              <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">Experience the warmth of our community and grow in your faith journey.</p>
+              <Link
+                href="/auth/register"
+                className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl bg-white text-indigo-900 font-bold text-base hover:bg-slate-100 transition-all shadow-2xl"
+              >
+                Get Started Today
+                <FiArrowRight />
+              </Link>
+            </div>
+          </div>
+        </motion.div>
       </section>
     </main>
   );

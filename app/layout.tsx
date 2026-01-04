@@ -2,6 +2,7 @@ import './globals.css';
 import React from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import NoticeBanner from './components/ui/NoticeBanner';
 import { ThemeProvider } from './components/ThemeProvider';
 import SessionProvider from './components/SessionProvider';
 import { Toaster } from 'react-hot-toast';
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SessionProvider>
           <ThemeProvider>
             <Toaster position="top-right" />
+            <NoticeBanner />
             <div className="flex flex-col min-h-screen">
               <Header />
 
