@@ -3,7 +3,7 @@ import { dbConnect } from '@/lib/db';
 import Post, { IPost } from '@/models/Post';
 import jwt from 'jsonwebtoken';
 import { notFound } from 'next/navigation';
-import PostView from '@/app/components/posts/PostView';
+import PublicPostLayout from '@/app/components/posts/PublicPostLayout';
 
 interface Props { params: Promise<{ token: string }> }
 
@@ -24,21 +24,13 @@ export default async function PreviewPage({ params }: Props) {
 
     await dbConnect();
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    const post = (await Post.findById(payload.postId).lean()) as unknown as IPost | null;
-    if (!post) return notFound();
+    const rawPost = (await Post.findById(payload.postId).populate('createdBy', 'name').lean()) as unknown as IPost | null;
+    if (!rawPost) return notFound();
+
+    // Serialize for Client Component
+    const post = JSON.parse(JSON.stringify(rawPost));
 
     // Allow preview of drafts and published posts
     // Render server-side to avoid leaking other drafts
-    return (
-        <main className="max-w-3xl mx-auto p-6 bg-white dark:bg-slate-900">
-            <article>
-                <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-                {post.featureImage && <img src={post.featureImage} alt={post.title} className="w-full h-auto rounded mb-4" />}
-                <div className="text-sm text-slate-500 mb-4">
-                    {post.status === 'published' ? `Published: ${post.publishedAt ? new Date(post.publishedAt).toLocaleString() : new Date(post.createdAt).toLocaleString()}` : 'Draft preview'}
-                </div>
-                <PostView body={post.body} />
-            </article>
-        </main>
-    );
+    return <PublicPostLayout post={post} previewMode={true} />;
 }

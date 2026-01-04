@@ -44,9 +44,9 @@ export default function PreviewDraftButton({ postId }: Props) {
     <button
       type="button"
       onClick={handlePreview}
-      className="px-3 py-1 border rounded text-sm bg-white text-black hover:bg-slate-100 dark:bg-slate-800 dark:text-white hover:dark:bg-slate-700"
+      className="px-3 py-2 border rounded text-sm bg-white text-black hover:bg-slate-100 dark:bg-slate-800 dark:text-white hover:dark:bg-slate-700"
     >
-      Preview
+      Preview URL
     </button>
   );
 }

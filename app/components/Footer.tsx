@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 export default function Footer() {
     const pathname = usePathname();
 
-    // Hide footer on dashboard routes
     if (pathname?.startsWith('/dashboard')) {
         return null;
     }
@@ -29,6 +28,11 @@ export default function Footer() {
                             <li>
                                 <Link href="/events" className="hover:text-indigo-600 dark:hover:text-white transition-colors">
                                     Events
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/blogs" className="hover:text-indigo-600 dark:hover:text-white transition-colors">
+                                    Blogs
                                 </Link>
                             </li>
                             <li>
@@ -62,7 +66,7 @@ export default function Footer() {
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-center pt-8 gap-4 text-xs font-medium text-slate-400 uppercase tracking-tighter">
-                    <div>© {new Date().getFullYear()} ChurchDev Platform. All rights reserved.</div>
+                    <div>© {new Date().getFullYear()} apela-x</div>
                 </div>
             </div>
         </footer>
