@@ -25,12 +25,11 @@ export const authOptions: NextAuthOptions = {
 
                 const dbProvider = user.provider || AuthProvider.CREDENTIALS;
                 console.log('Provider in DB (effective):', dbProvider);
-                console.log('Provider expected:', AuthProvider.CREDENTIALS);
                 console.log('Status in DB:', user.status);
 
-                // enforce provider consistency: if account was created with Google, require Google unless password is set
-                if (dbProvider !== AuthProvider.CREDENTIALS) {
-                    console.log('Auth check failed: Provider mismatch');
+
+                if (!user.passwordHash) {
+                    console.log('Auth check failed: No password set for this account');
                     throw new Error('Please sign in with Google or set a password in your account settings');
                 }
 
@@ -66,10 +65,15 @@ export const authOptions: NextAuthOptions = {
 
                 const existing = await User.findOne({ email });
 
-                // If existing user created with credentials (email/password) and provider === 'credentials', do not allow Google login automatically.
+                // If existing user created with credentials, upgrade their account to support Google OAuth
                 if (existing && existing.provider === AuthProvider.CREDENTIALS) {
-                    // Prevent OAuth sign in for an account created with credentials (unless the user links accounts separately)
-                    return '/auth/error?error=use-credentials';
+                    // Update the provider to Google and activate the account
+                    existing.provider = AuthProvider.GOOGLE;
+                    if (existing.status !== 'active') {
+                        existing.status = 'active'; // Google verifies email, so activate account
+                    }
+                    await existing.save();
+                    return true; // Allow sign in and complete the Google OAuth flow
                 }
 
                 if (!existing) {
