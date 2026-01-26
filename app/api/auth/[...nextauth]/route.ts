@@ -78,7 +78,7 @@ export const authOptions: NextAuthOptions = {
 
                 if (!existing) {
                     // create new user from Google — default role member, active
-                    await User.create({
+                    const newUser = await User.create({
                         email,
                         name: user.name,
                         role: UserRole.MEMBER,
@@ -86,6 +86,17 @@ export const authOptions: NextAuthOptions = {
                         provider: AuthProvider.GOOGLE,
                         verificationToken: null,
                     });
+
+                    // Link existing guest payments to this user
+                    try {
+                        const Payment = (await import('@/models/Payment')).default;
+                        await Payment.updateMany(
+                            { guestEmail: email, user: null },
+                            { user: newUser._id }
+                        );
+                    } catch (err) {
+                        console.error("Failed to link guest payments for Google user:", err);
+                    }
                     return true;
                 }
 
@@ -102,12 +113,24 @@ export const authOptions: NextAuthOptions = {
             return true;
         },
 
-        async jwt({ token, user }) {
+        async jwt({ token, user, account }) {
             if (user) {
-                token.id = (user as any).id || token.id;
-                token.role = (user as any).role || token.role;
-                token.status = (user as any).status || token.status;
-                token.provider = (user as any).provider || token.provider;
+                // For Google provider, we must ensure we use the MongoDB _id, not the Google Profile ID
+                if (account?.provider === AuthProvider.GOOGLE) {
+                    await dbConnect();
+                    const dbUser = await User.findOne({ email: user.email?.toLowerCase() });
+                    if (dbUser) {
+                        token.id = dbUser._id.toString();
+                        token.role = dbUser.role;
+                        token.status = dbUser.status;
+                        token.provider = dbUser.provider;
+                    }
+                } else {
+                    token.id = (user as any).id || token.id;
+                    token.role = (user as any).role || token.role;
+                    token.status = (user as any).status || token.status;
+                    token.provider = (user as any).provider || token.provider;
+                }
             }
             return token;
         },

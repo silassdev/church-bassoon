@@ -20,6 +20,19 @@ export async function POST(req: Request) {
   const { userId, title, body, url } = await req.json();
   await dbConnect();
   if (!(session as any).user.role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  const n = await Notification.create({ user: userId, actor: (session as any).user.id, title, body, url, read: false });
+
+  // Ensure IDs are valid ObjectIds if provided
+  const mongoose = (await import('mongoose')).default;
+  const isValidUserId = userId && mongoose.Types.ObjectId.isValid(userId);
+  const isValidActorId = (session as any).user.id && mongoose.Types.ObjectId.isValid((session as any).user.id);
+
+  const n = await Notification.create({
+    user: isValidUserId ? userId : null,
+    actor: isValidActorId ? (session as any).user.id : null,
+    title,
+    body,
+    url,
+    read: false
+  });
   return NextResponse.json(n);
 }
