@@ -26,6 +26,11 @@ export default function Footer() {
                         <h4 className="font-bold text-sm uppercase tracking-widest text-indigo-600">Navigate</h4>
                         <ul className="space-y-3 text-sm text-slate-500 dark:text-slate-400">
                             <li>
+                                <Link href="/give" className="hover:text-indigo-600 dark:hover:text-white transition-colors font-bold">
+                                    Give
+                                </Link>
+                            </li>
+                            <li>
                                 <Link href="/events" className="hover:text-indigo-600 dark:hover:text-white transition-colors">
                                     Events
                                 </Link>

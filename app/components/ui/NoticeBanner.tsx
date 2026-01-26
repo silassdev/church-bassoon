@@ -7,13 +7,20 @@ type Notice = {
     _id: string;
     text: string;
     addedByName?: string;
-    addedByRole?: string;
+    createdAt: string;
     active: boolean;
 };
 
 export default function NoticeBanner() {
     const [notice, setNotice] = useState<Notice | null>(null);
     const [isVisible, setIsVisible] = useState(true);
+
+    useEffect(() => {
+        if (notice && isVisible) {
+            const timer = setTimeout(() => setIsVisible(false), 10000);
+            return () => clearTimeout(timer);
+        }
+    }, [notice, isVisible]);
 
     useEffect(() => {
         // Load the most recent active announcement
@@ -89,12 +96,7 @@ export default function NoticeBanner() {
                                             <span className="font-bold">{notice.text}</span>
                                             {' '}•{' '}
                                             <span className="text-white/80 text-sm">
-                                                Posted by {notice.addedByName || 'Admin'}
-                                                {notice.addedByRole && (
-                                                    <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs font-bold uppercase">
-                                                        {notice.addedByRole}
-                                                    </span>
-                                                )}
+                                                Posted by {notice.addedByName || 'System'} • {new Date(notice.createdAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at {new Date(notice.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         </span>
                                         {/* Duplicate for seamless loop */}
@@ -102,12 +104,7 @@ export default function NoticeBanner() {
                                             <span className="font-bold">{notice.text}</span>
                                             {' '}•{' '}
                                             <span className="text-white/80 text-sm">
-                                                Posted by {notice.addedByName || 'Admin'}
-                                                {notice.addedByRole && (
-                                                    <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs font-bold uppercase">
-                                                        {notice.addedByRole}
-                                                    </span>
-                                                )}
+                                                Posted by {notice.addedByName || 'System'} • {new Date(notice.createdAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at {new Date(notice.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         </span>
                                     </motion.div>

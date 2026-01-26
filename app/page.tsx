@@ -223,6 +223,85 @@ function LatestBlogsSection() {
   );
 }
 
+// Featured Give Section
+function FeaturedGiveSection() {
+  const [options, setOptions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadOptions() {
+      try {
+        const res = await fetch('/api/payment-options');
+        if (res.ok) {
+          const data = await res.json();
+          setOptions(data.slice(0, 2));
+        }
+      } catch (err) {
+        console.error('Failed to load options:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadOptions();
+  }, []);
+
+  if (options.length === 0 && !loading) return null;
+
+  return (
+    <section className="container py-24 bg-slate-50/50 dark:bg-slate-900/50 rounded-[3rem] my-12 border border-slate-100 dark:border-slate-800/50 shadow-inner">
+      <div className="text-center mb-16 px-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em]"
+        >
+          Partner with us
+        </motion.div>
+        <h2 className="text-4xl md:text-5xl font-black mb-4">Support Our Mission</h2>
+        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Your contributions help us reach more people and deepen our community impact.</p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-6 mb-12">
+        {loading ? (
+          [1, 2].map(i => <div key={i} className="h-64 bg-white dark:bg-slate-800 rounded-3xl animate-pulse border border-slate-100 dark:border-slate-800" />)
+        ) : (
+          options.map((opt, index) => (
+            <motion.div
+              key={opt._id}
+              initial={{ opacity: 0, x: index === 0 ? -30 : 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="group bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-indigo-500/5 hover:border-indigo-500/30 transition-all flex flex-col items-center text-center"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-900/40 flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform">
+                <FiCreditCard size={32} />
+              </div>
+              <h3 className="text-2xl font-black mb-2 text-slate-900 dark:text-white uppercase tracking-tight">{opt.title}</h3>
+              <p className="text-sm text-slate-500 mb-8 line-clamp-2">{opt.description || 'Support our ongoing ministry and outreach efforts.'}</p>
+              <Link
+                href="/give"
+                className="mt-auto px-8 py-3 bg-slate-900 dark:bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-black dark:hover:bg-indigo-700 transition-all shadow-lg"
+              >
+                Contribute Now
+              </Link>
+            </motion.div>
+          ))
+        )}
+      </div>
+
+      <div className="text-center">
+        <Link
+          href="/give"
+          className="text-sm font-black text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-all flex items-center justify-center gap-2 group"
+        >
+          View All Payment Options
+          <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -653,6 +732,9 @@ export default function Home() {
 
       {/* Latest Events Section */}
       <LatestEventsSection />
+
+      {/* Featured Give Section */}
+      <FeaturedGiveSection />
 
       {/* Latest Blogs Section */}
       <LatestBlogsSection />
