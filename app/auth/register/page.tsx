@@ -16,6 +16,7 @@ export default function RegisterPage() {
     const [role, setRole] = useState<'member' | 'coordinator'>('member');
     const [msg, setMsg] = useState('');
     const [loading, setLoading] = useState(false);
+    const [socialLoading, setSocialLoading] = useState(false);
     const [emailConfirm, setEmailConfirm] = useState('');
     const [hasPayments, setHasPayments] = useState(false);
     const [formLoadTs, setFormLoadTs] = useState<number | null>(null);
@@ -216,11 +217,29 @@ export default function RegisterPage() {
                     </div>
 
                     <button
-                        onClick={() => signIn('google')}
-                        className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all font-bold text-slate-700 dark:text-slate-200"
+                        onClick={async () => {
+                            setSocialLoading(true);
+                            // We pass the intended role in the callback URL so we can handle it after Google redirect
+                            await signIn('google', { callbackUrl: `/dashboard?initRole=${role}` });
+                        }}
+                        disabled={socialLoading || loading}
+                        className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all font-bold text-slate-700 dark:text-slate-200 disabled:opacity-50"
                     >
-                        <FcGoogle size={24} />
-                        Sign up with Google
+                        {socialLoading ? (
+                            <div className="flex items-center gap-2">
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                    className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full"
+                                />
+                                Checking identity...
+                            </div>
+                        ) : (
+                            <>
+                                <FcGoogle size={24} />
+                                Sign up with Google
+                            </>
+                        )}
                     </button>
                 </div>
 

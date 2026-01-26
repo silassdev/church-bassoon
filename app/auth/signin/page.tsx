@@ -13,6 +13,7 @@ export default function SignInPage() {
     const [password, setPassword] = useState('');
     const [err, setErr] = useState('');
     const [loading, setLoading] = useState(false);
+    const [socialLoading, setSocialLoading] = useState(false);
 
     async function handleCredentials(e: React.FormEvent) {
         e.preventDefault();
@@ -41,11 +42,28 @@ export default function SignInPage() {
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-[2rem] shadow-2xl relative">
 
                     <button
-                        onClick={() => signIn('google')}
-                        className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all font-bold text-slate-700 dark:text-slate-200"
+                        onClick={async () => {
+                            setSocialLoading(true);
+                            await signIn('google', { callbackUrl: '/dashboard' });
+                        }}
+                        disabled={socialLoading || loading}
+                        className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all font-bold text-slate-700 dark:text-slate-200 disabled:opacity-50"
                     >
-                        <FcGoogle size={24} />
-                        Continue with Google
+                        {socialLoading ? (
+                            <div className="flex items-center gap-2">
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                    className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full"
+                                />
+                                Redirecting to Google...
+                            </div>
+                        ) : (
+                            <>
+                                <FcGoogle size={24} />
+                                Continue with Google
+                            </>
+                        )}
                     </button>
 
                     <div className="relative my-8 text-center">

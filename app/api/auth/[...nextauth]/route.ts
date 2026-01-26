@@ -43,7 +43,7 @@ export const authOptions: NextAuthOptions = {
 
                 if (!valid) throw new Error('Invalid credentials');
 
-                return { id: user._id.toString(), email: user.email, name: user.name, role: user.role, provider: user.provider };
+                return { id: user._id.toString(), email: user.email, name: user.name, role: user.role, status: user.status, provider: user.provider };
             },
         }),
 
@@ -106,6 +106,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = (user as any).id || token.id;
                 token.role = (user as any).role || token.role;
+                token.status = (user as any).status || token.status;
                 token.provider = (user as any).provider || token.provider;
             }
             return token;
@@ -114,6 +115,7 @@ export const authOptions: NextAuthOptions = {
         async session({ session, token }) {
             (session as any).user.id = token.id;
             (session as any).user.role = token.role;
+            (session as any).user.status = token.status;
             (session as any).user.provider = token.provider;
             return session;
         },
