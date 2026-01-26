@@ -111,6 +111,16 @@ export async function POST(req: Request) {
         provider: AuthProvider.CREDENTIALS,
     });
 
+    // Link existing guest payments to this user
+    try {
+        await (require('@/models/Payment').default).updateMany(
+            { guestEmail: String(email).toLowerCase(), user: null },
+            { user: user._id }
+        );
+    } catch (err) {
+        console.error("Failed to link guest payments:", err);
+    }
+
     try {
         await sendVerificationEmail({ to: email, token, userId: user._id.toString() });
     } catch (e) {

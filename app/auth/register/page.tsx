@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { FcGoogle } from 'react-icons/fc';
-import { FiUser, FiMail, FiLock, FiShield, FiArrowRight, FiAlertCircle, FiCheck } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiShield, FiArrowRight, FiAlertCircle, FiCheck, FiCreditCard } from 'react-icons/fi';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 
@@ -16,16 +16,32 @@ export default function RegisterPage() {
     const [role, setRole] = useState<'member' | 'coordinator'>('member');
     const [msg, setMsg] = useState('');
     const [loading, setLoading] = useState(false);
-    const [formLoadTs, setFormLoadTs] = useState<number | null>(null);
     const [emailConfirm, setEmailConfirm] = useState('');
+    const [hasPayments, setHasPayments] = useState(false);
+    const [formLoadTs, setFormLoadTs] = useState<number | null>(null);
 
     useEffect(() => {
         setFormLoadTs(Date.now());
-        setEmailConfirm(email);
     }, []);
 
     useEffect(() => {
         setEmailConfirm(email);
+
+        // Check for payments when email is valid-ish
+        const check = async () => {
+            if (email.includes('@') && email.includes('.')) {
+                try {
+                    const res = await fetch(`/api/auth/check-payments?email=${encodeURIComponent(email)}`);
+                    const data = await res.json();
+                    setHasPayments(data.found);
+                } catch (e) { }
+            } else {
+                setHasPayments(false);
+            }
+        };
+
+        const timer = setTimeout(check, 500);
+        return () => clearTimeout(timer);
     }, [email]);
 
     async function handleSubmit(e: React.FormEvent) {
@@ -141,6 +157,26 @@ export default function RegisterPage() {
                                 />
                             </div>
                         </div>
+
+                        {hasPayments && !msg && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/20 shadow-sm"
+                            >
+                                <div className="flex gap-4 text-left">
+                                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-indigo-600 shadow-sm flex-shrink-0">
+                                        <FiCreditCard size={20} />
+                                    </div>
+                                    <div className="space-y-1 text-left">
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">Returning Member?</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                                            Looks like you used this platform before. Complete registration and access all your payments made through this email address.
+                                        </p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
 
                         {/* HONEYPOT / hidden fields */}
                         <div aria-hidden className="sr-only" style={{ position: 'absolute', left: '-10000px', top: 'auto' }}>

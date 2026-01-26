@@ -8,12 +8,28 @@ export const metadata = {
     description: 'Read the latest updates, stories, and announcements.',
 };
 
-export default async function BlogsPage() {
+export default async function BlogsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string }>;
+}) {
+    const params = await searchParams;
+    const page = Math.max(1, Number(params.page || 1));
+    const limit = 9;
+    const skip = (page - 1) * limit;
+
     await dbConnect();
+    
+    const filter = { status: 'published' };
+    const total = await Post.countDocuments(filter);
+    const totalPages = Math.ceil(total / limit);
+
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    const rawPosts = await Post.find({ status: 'published' })
+    const rawPosts = await Post.find(filter)
         .sort({ publishedAt: -1 })
         .populate('createdBy', 'name')
+        .skip(skip)
+        .limit(limit)
         .lean();
 
     const posts = JSON.parse(JSON.stringify(rawPosts));
@@ -23,7 +39,7 @@ export default async function BlogsPage() {
             {/* Header */}
             <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-20">
                 <div className="container mx-auto px-6 text-center">
-                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 shadow-sm inline-block px-4">
                         Our Latest Stories
                     </h1>
                     <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
@@ -93,6 +109,31 @@ export default async function BlogsPage() {
                         </Link>
                     ))}
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="mt-16 flex justify-center items-center gap-4">
+                        {page > 1 && (
+                            <Link
+                                href={`/blogs?page=${page - 1}`}
+                                className="px-6 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                            >
+                                Previous
+                            </Link>
+                        )}
+                        <span className="text-sm font-bold text-slate-500">
+                            Page {page} of {totalPages}
+                        </span>
+                        {page < totalPages && (
+                            <Link
+                                href={`/blogs?page=${page + 1}`}
+                                className="px-6 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                            >
+                                Next
+                            </Link>
+                        )}
+                    </div>
+                )}
 
                 {posts.length === 0 && (
                     <div className="text-center py-32 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 dashed">

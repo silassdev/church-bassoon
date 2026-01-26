@@ -133,6 +133,96 @@ function LatestEventsSection() {
   );
 }
 
+// Latest Blogs Component
+function LatestBlogsSection() {
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        const res = await fetch('/api/posts?status=published&limit=3');
+        if (res.ok) {
+          const data = await res.json();
+          setPosts(data.posts || []);
+        }
+      } catch (err) {
+        console.error('Failed to load posts:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPosts();
+  }, []);
+
+  if (posts.length === 0 && !loading) return null;
+
+  return (
+    <section className="container py-24 border-t border-slate-200/50 dark:border-slate-800/50">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="text-center mb-16"
+      >
+        <h2 className="text-4xl md:text-5xl font-black mb-4">Latest Stories</h2>
+        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Stay updated with the latest news, insights, and inspirations from our community.</p>
+      </motion.div>
+
+      {loading ? (
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-64 bg-slate-200 dark:bg-slate-800 rounded-3xl animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          {posts.map((post, index) => (
+            <motion.div
+              key={post._id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+            >
+              <div className="h-48 overflow-hidden relative bg-slate-100 dark:bg-slate-800">
+                {post.featureImage ? (
+                  <img
+                    src={post.featureImage}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-4xl">📝</div>
+                )}
+              </div>
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">{post.title}</h3>
+                <p className="text-slate-500 text-sm line-clamp-2 mb-4 opacity-80">{post.body?.replace(/[#*`]/g, '').substring(0, 100)}...</p>
+                <div className="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <span>{new Date(post.publishedAt || post.createdAt).toLocaleDateString()}</span>
+                  <Link href={`/posts/${post.slug}`} className="text-indigo-600 hover:underline">Read More</Link>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      <div className="text-center">
+        <Link
+          href="/blogs"
+          className="inline-flex items-center gap-2 px-8 py-4 glass border border-slate-200 dark:border-slate-800 font-bold rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all"
+        >
+          View All Stories
+          <FiArrowRight />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -563,6 +653,9 @@ export default function Home() {
 
       {/* Latest Events Section */}
       <LatestEventsSection />
+
+      {/* Latest Blogs Section */}
+      <LatestBlogsSection />
 
       {/* Weekly Church Schedule */}
       <section className="container pb-32 pt-12">

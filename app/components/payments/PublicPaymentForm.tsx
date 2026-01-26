@@ -75,6 +75,12 @@ export default function PublicPaymentForm({ option }: { option?: any }) {
       </div>
 
       <div className="relative z-10">
+        {/* Headline Section */}
+        <div className="mb-10 text-center">
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2">Headline Contribution</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Your generous giving fuels our global impact and ministry growth.</p>
+        </div>
+
         <div className="flex items-center gap-3 mb-8">
           <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
             <Banknote size={24} />
@@ -150,11 +156,10 @@ export default function PublicPaymentForm({ option }: { option?: any }) {
               </>
             )}
           </button>
+        </form>
       </div>
     </div>
-    </div >
   );
 }
 
-// Fixed missing Info import
 import { Info } from 'lucide-react';

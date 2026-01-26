@@ -3,7 +3,8 @@ import { dbConnect } from '@/lib/db';
 import Post from '@/models/Post';
 import { requireStaff } from '@/lib/requireStaff';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireStaff();
   await dbConnect();
 
@@ -17,14 +18,15 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     update.publishedAt = new Date();
   }
 
-  const post = await Post.findByIdAndUpdate(params.id, update, { new: true });
+  const post = await Post.findByIdAndUpdate(id, update, { new: true });
   return NextResponse.json(post);
 }
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   await requireStaff();
   await dbConnect();
 
-  await Post.findByIdAndDelete(params.id);
+  await Post.findByIdAndDelete(id);
   return NextResponse.json({ ok: true });
 }

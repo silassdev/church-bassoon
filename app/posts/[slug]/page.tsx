@@ -3,11 +3,11 @@ import Post from '@/models/Post';
 import { notFound } from 'next/navigation';
 import PublicPostLayout from '@/app/components/posts/PublicPostLayout';
 
-interface Props { params: { slug: string } }
+interface Props { params: Promise<{ slug: string }> }
 
 export default async function PostPage({ params }: Props) {
+  const { slug } = await params;
   await dbConnect();
-  const slug = params.slug;
   const rawPost = await Post.findOne({ slug, status: 'published' })
     .populate('createdBy', 'name')
     .lean();
