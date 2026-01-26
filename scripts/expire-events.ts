@@ -4,7 +4,7 @@ import Event from '../models/Event';
 async function main() {
   await dbConnect();
   const now = new Date();
-  const res = await Event.updateMany({ active: true, endAt: { $lte: now } }, { $set: { active: false } });
+  const res = await Event.updateMany({ active: true, endAt: { $lte: now } }, { $set: { active: false } }) as any;
   console.log('expired events updated', res.modifiedCount || res.nModified || res.modified || res);
   process.exit(0);
 }
