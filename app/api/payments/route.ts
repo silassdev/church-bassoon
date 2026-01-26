@@ -74,7 +74,6 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     console.error('Paystack initialization error:', error);
-    // Delete the payment record if Paystack fails
     await Payment.findByIdAndDelete(p._id);
     return NextResponse.json({
       error: 'Failed to initialize payment',

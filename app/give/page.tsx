@@ -32,7 +32,9 @@ export default function GivePage() {
     const [processing, setProcessing] = useState(false);
     const [success, setSuccess] = useState(false);
     const [emailError, setEmailError] = useState('');
+    const [formError, setFormError] = useState('');
     const [paymentReference, setPaymentReference] = useState('');
+    const [paymentUrl, setPaymentUrl] = useState('');
 
     // Payment categories for custom amounts
     const paymentCategories = [
@@ -141,6 +143,7 @@ export default function GivePage() {
         }
 
         setProcessing(true);
+        setFormError('');
         try {
             const body = {
                 title: isCustomAmount ? category : selectedOption?.title,
@@ -162,14 +165,15 @@ export default function GivePage() {
                 throw new Error(data?.error || 'Payment initiation failed');
             }
 
-            // Redirect to Paystack payment page
+            // Show success modal with Paystack link
             if (data.authorization_url) {
-                window.location.href = data.authorization_url;
+                setPaymentUrl(data.authorization_url);
+                setSuccess(true);
             } else {
                 throw new Error('No payment URL received');
             }
         } catch (err: any) {
-            alert(err.message || 'Failed to process payment');
+            setFormError(err.message || 'Failed to process payment');
         } finally {
             setProcessing(false);
         }
@@ -181,6 +185,8 @@ export default function GivePage() {
         setIsCustomAmount(false);
         setAmount('');
         setCategory('Offering');
+        setFormError('');
+        setPaymentUrl('');
         if (!session) {
             setName('');
             setEmail('');
@@ -203,19 +209,30 @@ export default function GivePage() {
                             <>If you register later using <span className="font-bold">{email}</span>, this payment will be automatically linked to your account.</>
                         )}
                     </p>
-                    <div className="flex gap-4 justify-center">
-                        <button
-                            onClick={resetForm}
-                            className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-all"
-                        >
-                            Make Another Payment
-                        </button>
-                        <Link
-                            href="/"
-                            className="px-8 py-4 glass border border-slate-200 dark:border-slate-800 font-bold rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-                        >
-                            Back to Home
-                        </Link>
+                    <div className="flex flex-col gap-4 items-center">
+                        {paymentUrl && (
+                            <a
+                                href={paymentUrl}
+                                className="w-full max-w-sm px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl transition-all shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-2"
+                            >
+                                <CreditCard size={20} />
+                                Proceed to Paystack
+                            </a>
+                        )}
+                        <div className="flex gap-4 justify-center w-full">
+                            <button
+                                onClick={resetForm}
+                                className="px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold rounded-2xl transition-all hover:bg-slate-200 dark:hover:bg-slate-700"
+                            >
+                                Make Another
+                            </button>
+                            <Link
+                                href="/"
+                                className="px-8 py-4 glass border border-slate-200 dark:border-slate-800 font-bold rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                            >
+                                Back to Home
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -445,25 +462,41 @@ export default function GivePage() {
 
                     {/* Submit Button */}
                     {(isCustomAmount || selectedOption) && amount && Number(amount) > 0 && (
-                        <div className="flex justify-center">
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className="group px-12 py-5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-slate-400 disabled:to-slate-400 text-white rounded-2xl font-black text-lg flex items-center gap-3 transition-all shadow-2xl shadow-indigo-500/30 hover:scale-105 disabled:scale-100"
-                            >
-                                {processing ? (
-                                    <>
-                                        <Loader2 className="animate-spin" size={24} />
-                                        Processing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <ShieldCheck size={24} />
-                                        Complete Payment
-                                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                                    </>
-                                )}
-                            </button>
+                        <div className="space-y-6">
+                            {formError && (
+                                <div className="max-w-md mx-auto p-4 bg-rose-50 dark:bg-rose-900/20 rounded-2xl border border-rose-200 dark:border-rose-900/30 flex gap-3 animate-in fade-in zoom-in">
+                                    <AlertTriangle size={18} className="text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" />
+                                    <div className="flex-1">
+                                        <p className="text-sm font-bold text-rose-800 dark:text-rose-300">
+                                            Payment Error
+                                        </p>
+                                        <p className="text-xs text-rose-700 dark:text-rose-400 leading-relaxed">
+                                            {formError}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex justify-center">
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="group px-12 py-5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-slate-400 disabled:to-slate-400 text-white rounded-2xl font-black text-lg flex items-center gap-3 transition-all shadow-2xl shadow-indigo-500/30 hover:scale-105 disabled:scale-100"
+                                >
+                                    {processing ? (
+                                        <>
+                                            <Loader2 className="animate-spin" size={24} />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ShieldCheck size={24} />
+                                            Securely Pay with Paystack
+                                            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     )}
                 </form>
