@@ -1,14 +1,16 @@
 'use client';
 import { useState } from 'react';
-import { LayoutDashboard, Activity } from 'lucide-react';
+import { LayoutDashboard, Activity, MessageSquare } from 'lucide-react';
 import OverviewFragment from '@/app/components/admin/fragments/OverviewFragment';
 import SiteLogsFragment from '@/app/components/admin/fragments/SiteLogsFragment';
+import TicketsFragment from '@/app/components/coordinator/fragments/TicketsFragment';
 
 export default function AdminDashboardPage() {
-    const [activeTab, setActiveTab] = useState<'overview' | 'logs'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'tickets' | 'logs'>('overview');
 
     const tabs = [
         { id: 'overview' as const, label: 'Overview', icon: LayoutDashboard },
+        { id: 'tickets' as const, label: 'Tickets', icon: MessageSquare },
         { id: 'logs' as const, label: 'Site & Logs', icon: Activity },
     ];
 
@@ -36,6 +38,11 @@ export default function AdminDashboardPage() {
             {/* Tab Content */}
             <div className="min-h-[600px]">
                 {activeTab === 'overview' && <OverviewFragment />}
+                {activeTab === 'tickets' && (
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                        <TicketsFragment />
+                    </div>
+                )}
                 {activeTab === 'logs' && <SiteLogsFragment />}
             </div>
         </div>

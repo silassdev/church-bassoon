@@ -15,25 +15,40 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const ticket = await Ticket.findById(id);
   if (!ticket) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  // authorization: member can reply to own ticket; coordinator can reply to any
+  // authorization: member can reply to own ticket; coordinator/admin can reply to any
   const role = (session as any).user.role;
   const userId = (session as any).user.id;
   if (role === 'member' && String(ticket.user) !== String(userId)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!['member', 'coordinator', 'admin'].includes(role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const author = await User.findById(userId).lean() as any;
   ticket.replies.push({ authorId: userId, authorName: author?.name || author?.email || 'User', message, createdAt: new Date() });
-  ticket.status = role === 'coordinator' ? 'pending' : ticket.status;
+  ticket.status = ['coordinator', 'admin'].includes(role) ? 'pending' : ticket.status;
   await ticket.save();
 
   // create notification for the other party
-  const recipient = role === 'member' ? null : ticket.user; // if coordinator replied, notify user; if member replied, notify coordinator(s) -> for now notify admins/coordinators
-  if (role === 'coordinator') {
-    await Notification.create({ user: ticket.user, actor: userId, title: `Reply on ticket: ${ticket.subject}`, body: message, read: false });
+  if (['coordinator', 'admin'].includes(role)) {
+    // coordinator/admin replied -> notify member
+    await Notification.create({
+      user: ticket.user,
+      actor: userId,
+      title: `Reply on ticket: ${ticket.subject}`,
+      body: message,
+      url: `/dashboard/member/tickets?id=${id}`,
+      read: false
+    });
   } else {
-    // notify coordinators (simple: create notifications for all coordinators — adjust in prod)
-    const coordinators = await User.find({ role: 'coordinator' }).lean();
-    for (const c of coordinators) {
-      await Notification.create({ user: c._id, actor: userId, title: `New reply on ticket: ${ticket.subject}`, body: message, read: false });
+    // member replied -> notify staff
+    const staff = await User.find({ role: { $in: ['coordinator', 'admin'] } }).lean();
+    for (const s of staff) {
+      await Notification.create({
+        user: s._id,
+        actor: userId,
+        title: `New reply on ticket: ${ticket.subject}`,
+        body: message,
+        url: `/dashboard/coordinator/tickets?q=${id}`,
+        read: false
+      });
     }
   }
 

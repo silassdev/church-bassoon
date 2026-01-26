@@ -15,7 +15,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const role = (session as any).user.role;
   const userId = (session as any).user.id;
   if (role === 'member' && String(t.user) !== String(userId)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  // coordinators and members who own it can close
+  // admins, coordinators and members who own it can close
+  if (!['member', 'coordinator', 'admin'].includes(role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   t.status = 'closed';
   await t.save();
   return NextResponse.json({ ok: true });

@@ -8,13 +8,15 @@ import {
   ArrowUpRight,
   ShieldCheck,
   TrendingUp,
-  Activity
+  Activity,
+  MessageSquare
 } from 'lucide-react';
 
 export default function OverviewFragment() {
   const [totalUsers, setTotalUsers] = useState('...');
   const [totalAnnouncements, setTotalAnnouncements] = useState('...');
   const [monthlyFinance, setMonthlyFinance] = useState('...');
+  const [totalTickets, setTotalTickets] = useState('...');
 
   useEffect(() => {
     async function loadStats() {
@@ -42,9 +44,17 @@ export default function OverviewFragment() {
         setTotalAnnouncements('0');
       }
 
-      // Fetch monthly finance (you can implement this based on your finance API)
-      // For now, keeping as placeholder
-      // setMonthlyFinance('$12,450');
+      // Fetch total tickets
+      try {
+        const ticketsRes = await fetch('/api/admin/tickets/stats');
+        if (ticketsRes.ok) {
+          const data = await ticketsRes.json();
+          setTotalTickets(data.open?.toString() || '0');
+        }
+      } catch (err) {
+        console.error('Failed to load tickets:', err);
+        setTotalTickets('0');
+      }
     }
 
     loadStats();
@@ -54,6 +64,7 @@ export default function OverviewFragment() {
     { label: 'Total Users', value: totalUsers, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
     { label: 'Monthly Finance', value: monthlyFinance, icon: CircleDollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
     { label: 'Announcements', value: totalAnnouncements, icon: Megaphone, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+    { label: 'Open Tickets', value: totalTickets, icon: MessageSquare, color: 'text-rose-600', bg: 'bg-rose-50 dark:bg-rose-900/20' },
   ];
 
   return (

@@ -9,7 +9,7 @@ export default function useNotifications(pollInterval = 15000) {
     if (!res.ok) return;
     const data = await res.json();
     setItems(data);
-    setUnreadCount(data.filter((d:any) => !d.read).length);
+    setUnreadCount(data.filter((d: any) => !d.read).length);
   }
 
   useEffect(() => {
@@ -18,5 +18,10 @@ export default function useNotifications(pollInterval = 15000) {
     return () => clearInterval(id);
   }, [pollInterval]);
 
-  return { items, unreadCount, reload: load };
+  async function markAllRead() {
+    await fetch('/api/notifications/mark-all-read', { method: 'POST' });
+    load();
+  }
+
+  return { items, unreadCount, reload: load, markAllRead };
 }

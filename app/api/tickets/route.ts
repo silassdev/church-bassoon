@@ -21,14 +21,18 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const q = url.searchParams.get('q') || '';
 
-  // coordinator view: list all, optionally search by subject or user email
-  if ((session as any).user.role === 'coordinator') {
+  // coordinator or admin view: list all, optionally search by subject or user email
+  if (['coordinator', 'admin'].includes((session as any).user.role)) {
     const filter: any = {};
     if (q) {
       const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
       filter.$or = [{ subject: re }, { message: re }];
     }
-    const list = await Ticket.find(filter).sort({ createdAt: -1 }).limit(200).lean();
+    const list = await Ticket.find(filter)
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .lean();
     return NextResponse.json(list);
   }
 
