@@ -255,10 +255,10 @@ function FeaturedGiveSection() {
           whileInView={{ opacity: 1, scale: 1 }}
           className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em]"
         >
-          Partner with us
+          Secure Payments
         </motion.div>
-        <h2 className="text-4xl md:text-5xl font-black mb-4">Support Our Mission</h2>
-        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Your contributions help us reach more people and deepen our community impact.</p>
+        <h2 className="text-4xl md:text-5xl font-black mb-4">Make a Payment</h2>
+        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">Choose from available payment options and complete your transaction securely.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto px-6 mb-12">
