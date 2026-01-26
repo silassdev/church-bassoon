@@ -55,18 +55,25 @@ export async function initializePaystackTransaction(params: {
         }),
     });
 
-    if (!response.ok) {
-        let errorBody;
-        try {
-            errorBody = await response.json();
-        } catch (e) {
-            errorBody = { message: response.statusText };
-        }
-        console.error('Paystack API Error details:', errorBody);
-        throw new Error(errorBody.message || `Paystack initialization failed: ${response.statusText}`);
+    const text = await response.text();
+    if (!text) {
+        throw new Error(`Paystack returned an empty response (Status: ${response.status})`);
     }
 
-    return response.json();
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch (e) {
+        console.error('Failed to parse Paystack JSON:', text);
+        throw new Error(`Invalid JSON response from Paystack (Status: ${response.status})`);
+    }
+
+    if (!response.ok) {
+        console.error('Paystack API Error details:', data);
+        throw new Error(data.message || `Paystack initialization failed: ${response.statusText}`);
+    }
+
+    return data;
 }
 
 

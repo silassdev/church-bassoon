@@ -159,7 +159,16 @@ export default function GivePage() {
                 body: JSON.stringify(body)
             });
 
-            const data = await res.json();
+            const contentType = res.headers.get('content-type');
+            let data: any = {};
+
+            if (contentType && contentType.includes('application/json')) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                console.error('Server returned non-JSON response:', text);
+                throw new Error('Server returned an unexpected response. Please check logs.');
+            }
 
             if (!res.ok) {
                 const errorMsg = data.details || data.error || 'Payment initiation failed';
