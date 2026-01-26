@@ -14,15 +14,24 @@ type PatchBody = {
 
 function validateProfileInput(data: PatchBody) {
   const errors: Record<string, string> = {};
-  if (data.name !== undefined && String(data.name).length > 100) errors.name = 'Name too long';
-  if (data.houseAddress !== undefined && String(data.houseAddress).length > 500) errors.houseAddress = 'Address too long';
-  if (data.state !== undefined && String(data.state).length > 100) errors.state = 'State too long';
-  if (data.city !== undefined && String(data.city).length > 100) errors.city = 'City too long';
-  if (data.dob !== undefined) {
+
+  // Mandatory fields check
+  if (!data.name || !String(data.name).trim()) errors.name = 'Required';
+  if (!data.houseAddress || !String(data.houseAddress).trim()) errors.houseAddress = 'Required';
+  if (!data.state || !String(data.state).trim()) errors.state = 'Required';
+  if (!data.city || !String(data.city).trim()) errors.city = 'Required';
+  if (!data.dob) errors.dob = 'Required';
+
+  // Length and format checks
+  if (data.name && String(data.name).length > 100) errors.name = 'Name too long';
+  if (data.houseAddress && String(data.houseAddress).length > 500) errors.houseAddress = 'Address too long';
+  if (data.state && String(data.state).length > 100) errors.state = 'State too long';
+  if (data.city && String(data.city).length > 100) errors.city = 'City too long';
+
+  if (data.dob) {
     const d = new Date(String(data.dob));
     if (isNaN(d.getTime())) errors.dob = 'Invalid date';
     else {
-      // optional: reject DOB in the future
       if (d.getTime() > Date.now()) errors.dob = 'DOB cannot be in the future';
     }
   }
@@ -62,7 +71,12 @@ export async function PATCH(req: Request) {
 
   const body: PatchBody = await req.json().catch(() => ({}));
   const errors = validateProfileInput(body);
-  if (Object.keys(errors).length > 0) return NextResponse.json({ error: 'validation', details: errors }, { status: 400 });
+  if (Object.keys(errors).length > 0) {
+    return NextResponse.json(
+      { error: 'All fields must be recorded or filled to proceed', details: errors },
+      { status: 400 }
+    );
+  }
 
   await dbConnect();
   const user = await User.findById((session as any).user.id);

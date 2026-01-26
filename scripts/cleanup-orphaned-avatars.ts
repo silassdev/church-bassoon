@@ -1,5 +1,4 @@
-// scripts/cleanup-orphaned-avatars.ts
-import dbConnect from '../lib/db';
+import { dbConnect } from '../lib/db';
 import User from '../models/User';
 import path from 'path';
 import fs from 'fs/promises';
@@ -227,7 +226,7 @@ async function main() {
 
   let html = `<h2>Avatar Orphan Cleanup Report</h2>`;
   html += `<p>Started: ${new Date(start).toISOString()}</p>`;
-  html += `<p>Elapsed: ${Math.round(elapsed/1000)}s</p>`;
+  html += `<p>Elapsed: ${Math.round(elapsed / 1000)}s</p>`;
   html += formatListAsHtml('Deleted S3 keys', deletedS3);
   html += formatListAsHtml('Deleted local files', deletedLocal);
   if (DRY_RUN) {
@@ -239,7 +238,7 @@ async function main() {
   const textLines: string[] = [];
   textLines.push('Avatar Orphan Cleanup Report');
   textLines.push(`Started: ${new Date(start).toISOString()}`);
-  textLines.push(`Elapsed: ${Math.round(elapsed/1000)}s`);
+  textLines.push(`Elapsed: ${Math.round(elapsed / 1000)}s`);
   textLines.push('');
   textLines.push(`Deleted S3 keys (${deletedS3.length}):`);
   for (const k of deletedS3) textLines.push(` - ${k}`);

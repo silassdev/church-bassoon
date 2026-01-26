@@ -85,7 +85,16 @@ export default function SignInPage() {
                                     className="w-full pl-12 pr-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all outline-none"
                                 />
                             </div>
+                            <div className="flex justify-end pr-1">
+                                <Link
+                                    href="/auth/forgot-password"
+                                    className="text-xs font-bold text-indigo-600 hover:text-indigo-500 hover:underline transition-all"
+                                >
+                                    Forgot password?
+                                </Link>
+                            </div>
                         </div>
+
 
                         {err && (
                             <motion.div

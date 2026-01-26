@@ -19,6 +19,8 @@ export interface IUser extends Document {
   avatarUrl?: string | null;
   avatarThumbUrl?: string | null;
   profileComplete?: boolean;
+  resetPasswordToken?: string | null;
+  resetPasswordExpires?: Date | null;
   createdAt: Date;
 }
 
@@ -40,6 +42,8 @@ const UserSchema = new Schema<IUser>({
   avatarUrl: { type: String, default: null },
   avatarThumbUrl: { type: String, default: null },
   profileComplete: { type: Boolean, default: false },
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null },
 
   createdAt: { type: Date, default: Date.now },
 });
