@@ -162,7 +162,8 @@ export default function GivePage() {
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data?.error || 'Payment initiation failed');
+                const errorMsg = data.details || data.error || 'Payment initiation failed';
+                throw new Error(errorMsg);
             }
 
             // Show success modal with Paystack link

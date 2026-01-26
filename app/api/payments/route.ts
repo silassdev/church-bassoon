@@ -42,7 +42,6 @@ export async function POST(req: Request) {
     metadata: body.metadata || {},
   });
 
-  // Initialize Paystack transaction
   try {
     const paystackResponse = await initializePaystackTransaction({
       email: guestEmail,
@@ -73,11 +72,15 @@ export async function POST(req: Request) {
       authorization_url: paystackResponse.data.authorization_url
     });
   } catch (error: any) {
-    console.error('Paystack initialization error:', error);
+    console.error('Paystack initialization error (Full Details):', {
+      message: error.message,
+      stack: error.stack,
+      reference
+    });
     await Payment.findByIdAndDelete(p._id);
     return NextResponse.json({
       error: 'Failed to initialize payment',
-      details: error.message
+      details: error.message || 'Unknown Paystack error'
     }, { status: 500 });
   }
 }

@@ -1,6 +1,10 @@
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || '';
 const PAYSTACK_BASE_URL = 'https://api.paystack.co';
 
+if (!PAYSTACK_SECRET_KEY) {
+    console.warn('WARNING: PAYSTACK_SECRET_KEY is not defined in environment variables.');
+}
+
 export interface PaystackInitializeResponse {
     status: boolean;
     message: string;
@@ -50,7 +54,14 @@ export async function initializePaystackTransaction(params: {
     });
 
     if (!response.ok) {
-        throw new Error(`Paystack initialization failed: ${response.statusText}`);
+        let errorBody;
+        try {
+            errorBody = await response.json();
+        } catch (e) {
+            errorBody = { message: response.statusText };
+        }
+        console.error('Paystack API Error details:', errorBody);
+        throw new Error(errorBody.message || `Paystack initialization failed: ${response.statusText}`);
     }
 
     return response.json();
