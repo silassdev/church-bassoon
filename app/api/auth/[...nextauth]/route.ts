@@ -131,6 +131,20 @@ export const authOptions: NextAuthOptions = {
                     token.status = (user as any).status || token.status;
                     token.provider = (user as any).provider || token.provider;
                 }
+            } else if (token.id) {
+                // Heal existing sessions with bad IDs (e.g. Google profile IDs)
+                const mongoose = (await import('mongoose')).default;
+                if (!mongoose.Types.ObjectId.isValid(token.id as string)) {
+                    await dbConnect();
+                    const dbUser = await User.findOne({ email: (token.email as string)?.toLowerCase() });
+                    if (dbUser) {
+                        token.id = dbUser._id.toString();
+                        token.role = dbUser.role;
+                        token.status = dbUser.status;
+                        token.provider = dbUser.provider || AuthProvider.GOOGLE;
+                        console.log(`[Auth] Healed session ID for user: ${token.email}`);
+                    }
+                }
             }
             return token;
         },

@@ -13,7 +13,16 @@ export async function POST(req: Request) {
 
   // If user logged in, attach
   const session = await getServerSession(authOptions);
-  const userId = session ? (session as any).user.id : null;
+  let userId = session ? (session as any).user.id : null;
+
+  // Defensive: Ensure userId is a valid MongoDB ObjectId
+  if (userId) {
+    const mongoose = (await import('mongoose')).default;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.warn('[Payments] Invalid userId in session, ignoring:', userId);
+      userId = null;
+    }
+  }
 
   const title = String(body.title || body.optionTitle || 'Payment').trim();
   const amount = Number(body.amount || 0);

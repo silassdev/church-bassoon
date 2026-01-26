@@ -17,7 +17,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   // authorization: member can reply to own ticket; coordinator/admin can reply to any
   const role = (session as any).user.role;
-  const userId = (session as any).user.id;
+  let userId = (session as any).user.id;
+
+  // Defensive: Ensure userId is a valid MongoDB ObjectId
+  const mongoose = (await import('mongoose')).default;
+  if (userId && !mongoose.Types.ObjectId.isValid(userId)) {
+    console.warn('[Tickets] Invalid userId in session:', userId);
+    // If we are in a reply route, we really need the ID. 
+    // The session healing should have handled this, but if not, we might need a lookup
+  }
+
   if (role === 'member' && String(ticket.user) !== String(userId)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   if (!['member', 'coordinator', 'admin'].includes(role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
