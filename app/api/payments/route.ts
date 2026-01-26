@@ -8,6 +8,7 @@ import { initializePaystackTransaction, generatePaymentReference } from '@/lib/p
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
+  console.log('Payment Request Body:', body);
   await dbConnect();
 
   // If user logged in, attach
@@ -54,6 +55,7 @@ export async function POST(req: Request) {
       },
       callback_url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/payment/callback`,
     });
+    console.log('Paystack Initialization Successful:', paystackResponse.data.reference);
 
     // Notify admins/coordinators
     try {
@@ -77,10 +79,16 @@ export async function POST(req: Request) {
       stack: error.stack,
       reference
     });
-    await Payment.findByIdAndDelete(p._id);
+
+    // Delete the payment record if Paystack fails
+    if (p && p._id) {
+      await Payment.findByIdAndDelete(p._id).catch(e => console.error('Cleanup failed:', e));
+    }
+
     return NextResponse.json({
       error: 'Failed to initialize payment',
-      details: error.message || 'Unknown Paystack error'
+      details: error.message || 'Unknown Paystack error',
+      type: error.name || 'Error'
     }, { status: 500 });
   }
 }

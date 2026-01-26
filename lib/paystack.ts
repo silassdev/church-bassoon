@@ -2,7 +2,9 @@ const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || '';
 const PAYSTACK_BASE_URL = 'https://api.paystack.co';
 
 if (!PAYSTACK_SECRET_KEY) {
-    console.warn('WARNING: PAYSTACK_SECRET_KEY is not defined in environment variables.');
+    console.error('CRITICAL ERROR: PAYSTACK_SECRET_KEY is missing from environment variables!');
+} else {
+    console.log('Paystack Utility: Secret Key is present (length: ' + PAYSTACK_SECRET_KEY.length + ')');
 }
 
 export interface PaystackInitializeResponse {
