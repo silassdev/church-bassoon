@@ -12,7 +12,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ show: false });
 
   await dbConnect();
-  const user = await User.findById((session as any).user.id).lean();
+  const user = await User.findById((session as any).user.id).lean() as any;
   if (!user) return NextResponse.json({ show: false });
 
   const dismissedAt = user.profileNoticeDismissedAt ? new Date(user.profileNoticeDismissedAt) : null;

@@ -44,7 +44,7 @@ export async function sendTemplate(opts: SendOpts) {
     log.sentAt = new Date();
     await log.save();
     return { ok: true, logId: log._id };
-  } catch (err) {
+  } catch (err: any) {
     log.status = 'failed';
     log.error = { message: err.message || String(err), stack: err.stack };
     await log.save();

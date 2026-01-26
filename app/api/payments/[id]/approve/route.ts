@@ -16,7 +16,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const note = String(body.note || '').trim();
 
   await dbConnect();
-  const payment = await Payment.findById(id);
+  const payment = await Payment.findById(id) as any;
   if (!payment) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   payment.adminApproval = { by: (session as any).user.id, decision, note, at: new Date() };

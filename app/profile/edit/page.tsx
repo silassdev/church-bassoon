@@ -12,7 +12,7 @@ export default async function EditProfilePage() {
 
   const user = await User.findById((session as any).user.id)
     .select('email name houseAddress dob state city')
-    .lean();
+    .lean() as any;
 
   if (!user) redirect('/profile');
 

@@ -12,7 +12,7 @@ export default async function ProfilePage() {
 
   const user = await User.findById((session as any).user.id)
     .select('email name houseAddress dob state city role status createdAt')
-    .lean();
+    .lean() as any;
 
   if (!user) redirect('/auth/signin');
 

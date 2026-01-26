@@ -6,10 +6,10 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const log = await EmailLog.findById(id);
+  const log = await EmailLog.findById(id) as any;
   if (!log) return Response.json({ error: 'Not found' }, { status: 404 });
 
-  await sendEmail(log.template, log.payload);
+  await sendEmail(log.templateName || log.template, log.payload || log.vars);
 
   return Response.json({ success: true });
 }

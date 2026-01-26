@@ -19,7 +19,7 @@ export default async function BlogsPage({
     const skip = (page - 1) * limit;
 
     await dbConnect();
-    
+
     const filter = { status: 'published' };
     const total = await Post.countDocuments(filter);
     const totalPages = Math.ceil(total / limit);
@@ -30,7 +30,7 @@ export default async function BlogsPage({
         .populate('createdBy', 'name')
         .skip(skip)
         .limit(limit)
-        .lean();
+        .lean() as any[];
 
     const posts = JSON.parse(JSON.stringify(rawPosts));
 

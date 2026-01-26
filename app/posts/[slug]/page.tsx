@@ -10,7 +10,7 @@ export default async function PostPage({ params }: Props) {
   await dbConnect();
   const rawPost = await Post.findOne({ slug, status: 'published' })
     .populate('createdBy', 'name')
-    .lean();
+    .lean() as any;
 
   if (!rawPost) return notFound();
 

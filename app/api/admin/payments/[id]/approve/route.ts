@@ -16,7 +16,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const note = String(body.note || '').trim();
 
   await dbConnect();
-  const payment = await Payment.findById(id);
+  const payment = await Payment.findById(id) as any;
   if (!payment) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   payment.adminApproval = { by: (session as any).user.id, decision, note, at: new Date() };
@@ -26,7 +26,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   // send email to user or guest
   try {
     if (payment.user) {
-      const u = await User.findById(payment.user).lean();
+      const u = await User.findById(payment.user).lean() as any;
       if (u?.email) await sendPaymentStatusEmail(u.email, { _id: payment._id.toString(), title: payment.title, amount: payment.amount, status: payment.status }, note);
     } else if (payment.guestEmail) {
       await sendPaymentStatusEmail(payment.guestEmail, { _id: payment._id.toString(), title: payment.title, amount: payment.amount, status: payment.status }, note);

@@ -5,7 +5,9 @@ export default function EmailLogsFragment() {
   const [logs, setLogs] = useState<any[]>([]);
   const [page, setPage] = useState(1);
 
-  useEffect(()=> load(), [page]);
+  useEffect(() => {
+    load();
+  }, [page]);
 
   async function load() {
     const res = await fetch(`/api/admin/email-logs?page=${page}&limit=20`);
@@ -14,7 +16,7 @@ export default function EmailLogsFragment() {
     setLogs(j.items || []);
   }
 
-  async function resend(id:string) {
+  async function resend(id: string) {
     const res = await fetch(`/api/admin/email-logs/${id}/resend`, { method: 'POST' });
     if (!res.ok) return alert('Resend failed');
     alert('Resent (check log)');
@@ -34,7 +36,7 @@ export default function EmailLogsFragment() {
                 <div className="mt-1 text-sm">{l.subject}</div>
               </div>
               <div className="flex flex-col gap-2">
-                <button onClick={()=>resend(l._id)} className="px-3 py-1 border rounded text-sm">Resend</button>
+                <button onClick={() => resend(l._id)} className="px-3 py-1 border rounded text-sm">Resend</button>
               </div>
             </div>
           </div>

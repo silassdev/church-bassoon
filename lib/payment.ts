@@ -10,17 +10,20 @@ export async function associateGuestPaymentsToUser(email: string, userId: string
   await dbConnect();
   const res = await Payment.updateMany({ guestEmail: String(email).trim(), user: null }, { $set: { user: userId } });
   return res.modifiedCount || (res as any).nModified || 0;
+}
 
+export async function initiatePayment(body: any) {
   const session = await getServerSession(authOptions);
   const userId = session ? (session as any).user.id : null;
 
   const title = String(body.title || body.optionTitle || 'Payment').trim();
   const amount = Number(body.amount || 0);
-  if (!amount || amount <= 0) return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
+  if (!amount || amount <= 0) throw new Error('Invalid amount');
 
   const guestEmail = body.guestEmail ? String(body.guestEmail).trim() : (session ? (session as any).user.email : null);
   const guestName = body.guestName ? String(body.guestName).trim() : (session ? (session as any).user.name : null);
 
+  await dbConnect();
   const p = await Payment.create({
     user: userId,
     guestName,
@@ -44,5 +47,5 @@ export async function associateGuestPaymentsToUser(email: string, userId: string
   }
 
   // return payment id for client checkout step
-  return NextResponse.json({ ok: true, paymentId: p._id });
+  return { ok: true, paymentId: (p as any)._id };
 }

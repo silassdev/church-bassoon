@@ -10,7 +10,7 @@ export const metadata = {
 
 export default async function GivePage() {
     await dbConnect();
-    const rawOptions = await PaymentOption.find({ active: true }).sort({ createdAt: -1 }).lean();
+    const rawOptions = (await PaymentOption.find({ active: true }).sort({ createdAt: -1 }).lean()) as any[];
     const options = JSON.parse(JSON.stringify(rawOptions)) as IPaymentOption[];
 
     return (
@@ -26,7 +26,7 @@ export default async function GivePage() {
                         Support the <span className="text-indigo-600">Ministry.</span>
                     </h1>
                     <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Your partnership enables us to continue our mission of hope and service. 
+                        Your partnership enables us to continue our mission of hope and service.
                         Every contribution, no matter the size, makes a meaningful difference.
                     </p>
                 </div>
@@ -39,11 +39,11 @@ export default async function GivePage() {
                         <div>
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Why We Give</h3>
                             <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                                Giving is an act of worship and a commitment to the growth of God's kingdom. 
+                                Giving is an act of worship and a commitment to the growth of God's kingdom.
                                 We are dedicated to transparency and stewardship in all received contributions.
                             </p>
                         </div>
-                        
+
                         <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
                             <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600">
                                 <ShieldCheck size={24} />

@@ -54,7 +54,7 @@ export async function GET(req: Request) {
     { $match: match },
     { $group: { _id: groupId, count: { $sum: 1 } } },
     { $sort: { _id: 1 } }
-  ];
+  ] as any[];
 
   const results = await Log.aggregate(pipeline).allowDiskUse(true);
   // normalize into array of { label, count }

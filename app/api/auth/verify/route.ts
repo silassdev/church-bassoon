@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     if (!token) return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
 
     await dbConnect();
-    const user = await User.findOne({ verificationToken: token });
+    const user = await User.findOne({ verificationToken: token }) as any;
     if (!user) return NextResponse.json({ error: 'Token not found' }, { status: 404 });
 
     user.verificationToken = undefined;

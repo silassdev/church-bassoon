@@ -8,7 +8,7 @@ import User from '@/models/User';
 const SECRET = process.env.PAYMENT_PROVIDER_WEBHOOK_SECRET || '';
 
 export async function POST(req: Request) {
-  const raw = await req.text().catch(()=>null);
+  const raw = await req.text().catch(() => null);
   const signature = (req.headers.get('x-provider-signature') || '').toString();
 
   if (!SECRET) {
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   if (!paymentId || !event) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
 
   await dbConnect();
-  const payment = await Payment.findById(paymentId);
+  const payment = await Payment.findById(paymentId) as any;
   if (!payment) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   if (event === 'charge.success') {
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     // notify user or guest via email
     try {
       if (payment.user) {
-        const u = await User.findById(payment.user).lean();
+        const u = await User.findById(payment.user).lean() as any;
         if (u?.email) await sendPaymentStatusEmail(u.email, { _id: payment._id.toString(), title: payment.title, amount: payment.amount, status: payment.status }, 'Payment received via provider.');
       } else if (payment.guestEmail) {
         await sendPaymentStatusEmail(payment.guestEmail, { _id: payment._id.toString(), title: payment.title, amount: payment.amount, status: payment.status }, 'Payment received via provider.');
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     await payment.save();
     try {
       if (payment.user) {
-        const u = await User.findById(payment.user).lean();
+        const u = await User.findById(payment.user).lean() as any;
         if (u?.email) await sendPaymentStatusEmail(u.email, { _id: payment._id.toString(), title: payment.title, amount: payment.amount, status: payment.status }, 'Your payment failed.');
       } else if (payment.guestEmail) {
         await sendPaymentStatusEmail(payment.guestEmail, { _id: payment._id.toString(), title: payment.title, amount: payment.amount, status: payment.status }, 'Your payment failed.');
